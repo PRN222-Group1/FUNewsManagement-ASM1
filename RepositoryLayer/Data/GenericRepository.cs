@@ -12,13 +12,13 @@ namespace RepositoryLayer.Data
     /// <typeparam name="T"></typeparam>
     public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
-        private readonly FakeDbContext _context;
+        private readonly FuNewsManagementContext _context;
 
         /// <summary>
         /// Injects a DbContext instance.
         /// </summary>
         /// <param name="context"></param>
-        public GenericRepository(FakeDbContext context)
+        public GenericRepository(FuNewsManagementContext context)
         {
             _context = context;
         }

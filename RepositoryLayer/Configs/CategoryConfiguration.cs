@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RepositoryLayer.Data;
+using RepositoryLayer.Entities;
 
 namespace RepositoryLayer.Configs
 {
@@ -10,8 +10,8 @@ namespace RepositoryLayer.Configs
         {
             builder.ToTable("Category");
 
-            builder.Property(e => e.CategoryId).HasColumnName("CategoryID");
-            builder.Property(e => e.CategoryDesciption).HasMaxLength(250);
+            builder.Property(e => e.Id).HasColumnName("CategoryID");
+            builder.Property(e => e.CategoryDescription).HasMaxLength(250);
             builder.Property(e => e.CategoryName).HasMaxLength(100);
             builder.Property(e => e.ParentCategoryId).HasColumnName("ParentCategoryID");
 

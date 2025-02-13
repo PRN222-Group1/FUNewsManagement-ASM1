@@ -1,14 +1,13 @@
-﻿namespace RepositoryLayer.Data;
+﻿namespace RepositoryLayer.Entities;
 
-public partial class Category
+public partial class Category : BaseEntity
 {
-    public short CategoryId { get; set; }
 
     public string CategoryName { get; set; } = null!;
 
-    public string CategoryDesciption { get; set; } = null!;
+    public string CategoryDescription { get; set; } = null!;
 
-    public short? ParentCategoryId { get; set; }
+    public int? ParentCategoryId { get; set; }
 
     public bool? IsActive { get; set; }
 

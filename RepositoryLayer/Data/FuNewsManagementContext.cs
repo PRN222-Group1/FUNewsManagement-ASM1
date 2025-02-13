@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using RepositoryLayer.Entities;
 using System.Reflection;
-using Microsoft.EntityFrameworkCore;
 
 namespace RepositoryLayer.Data;
 
@@ -23,6 +22,8 @@ public partial class FuNewsManagementContext : DbContext
     public virtual DbSet<SystemAccount> SystemAccounts { get; set; }
 
     public virtual DbSet<Tag> Tags { get; set; }
+
+    public virtual DbSet<NewsTag> NewsTags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

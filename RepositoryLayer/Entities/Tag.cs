@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace RepositoryLayer.Entities;
 
-namespace RepositoryLayer.Data;
-
-public partial class Tag
+public partial class Tag : BaseEntity
 {
-    public int TagId { get; set; }
-
     public string? TagName { get; set; }
 
     public string? Note { get; set; }

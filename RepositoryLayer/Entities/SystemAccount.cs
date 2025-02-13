@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RepositoryLayer.Data;
+namespace RepositoryLayer.Entities;
 
-public partial class SystemAccount
+public partial class SystemAccount : BaseEntity
 {
-    public short AccountId { get; set; }
 
     public string? AccountName { get; set; }
 

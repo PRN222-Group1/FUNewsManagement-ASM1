@@ -10,14 +10,14 @@ namespace RepositoryLayer.Data
     /// </summary>
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly FakeDbContext _context;
+        private readonly FuNewsManagementContext _context;
         private ConcurrentDictionary<string, object> _repositories;
 
         /// <summary>
         /// Injects a DbContext instance to be used by all repositories.
         /// </summary>
         /// <param name="context"></param>
-        public UnitOfWork(FakeDbContext context)
+        public UnitOfWork(FuNewsManagementContext context)
         {
             _context = context;
         }

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using RepositoryLayer.Data;
+using RepositoryLayer.Entities;
 
 namespace RepositoryLayer.Configs
 {
@@ -10,9 +10,7 @@ namespace RepositoryLayer.Configs
         {
             builder.ToTable("NewsArticle");
 
-            builder.Property(e => e.NewsArticleId)
-                .HasMaxLength(20)
-                .HasColumnName("NewsArticleID");
+            builder.Property(e => e.Id).HasColumnName("NewsArticleID");
             builder.Property(e => e.CategoryId).HasColumnName("CategoryID");
             builder.Property(e => e.CreatedById).HasColumnName("CreatedByID");
             builder.Property(e => e.CreatedDate).HasColumnType("datetime");
@@ -33,25 +31,27 @@ namespace RepositoryLayer.Configs
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_NewsArticle_SystemAccount");
 
-            builder.HasMany(d => d.Tags).WithMany(p => p.NewsArticles)
-                .UsingEntity<Dictionary<string, object>>(
-                    "NewsTag",
-                    r => r.HasOne<Tag>().WithMany()
-                        .HasForeignKey("TagId")
+            builder.HasMany(m => m.Tags)
+                .WithMany(t => t.NewsArticles)
+                .UsingEntity<NewsTag>(
+                    j => j
+                        .HasOne(nt => nt.Tag)
+                        .WithMany()
+                        .HasForeignKey(nt => nt.TagId)
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_NewsTag_Tag"),
-                    l => l.HasOne<NewsArticle>().WithMany()
-                        .HasForeignKey("NewsArticleId")
+                    j => j
+                        .HasOne(nt => nt.NewsArticle)
+                        .WithMany()
+                        .HasForeignKey(nt => nt.NewsArticleId)
                         .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_NewsTag_NewsArticle"),
                     j =>
                     {
-                        j.HasKey("NewsArticleId", "TagId");
+                        j.HasKey(nt => new { nt.NewsArticleId, nt.TagId });
+                        j.Property(nt => nt.NewsArticleId).HasColumnName("NewsArticleID");
+                        j.Property(nt => nt.TagId).HasColumnName("TagID");
                         j.ToTable("NewsTag");
-                        j.IndexerProperty<string>("NewsArticleId")
-                            .HasMaxLength(20)
-                            .HasColumnName("NewsArticleID");
-                        j.IndexerProperty<int>("TagId").HasColumnName("TagID");
                     });
         }
     }

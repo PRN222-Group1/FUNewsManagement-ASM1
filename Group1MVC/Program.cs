@@ -1,7 +1,14 @@
+using Group1MVC.Extensions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using RepositoryLayer.Data;
+using Teamo.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
 
@@ -23,5 +30,24 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+// Create a scope and call the service manually
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+var dbContext = services.GetRequiredService<FuNewsManagementContext>();
+var logger = services.GetRequiredService<ILogger<Program>>();
+
+try
+{
+    // Migrate changes to the database
+    await dbContext.Database.MigrateAsync();
+
+    // Seed the database with data
+    await ApplicationDbContextSeed.SeedAsync(dbContext);
+}
+catch (Exception ex)
+{
+    logger.LogError(ex, "A message occured during migration");
+}
 
 app.Run();

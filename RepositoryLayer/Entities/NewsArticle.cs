@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace RepositoryLayer.Entities;
 
-namespace RepositoryLayer.Data;
-
-public partial class NewsArticle
+public partial class NewsArticle : BaseEntity
 {
-    public string NewsArticleId { get; set; } = null!;
-
     public string? NewsTitle { get; set; }
 
     public string Headline { get; set; } = null!;
@@ -17,13 +12,13 @@ public partial class NewsArticle
 
     public string? NewsSource { get; set; }
 
-    public short? CategoryId { get; set; }
+    public int? CategoryId { get; set; }
 
     public bool? NewsStatus { get; set; }
 
-    public short? CreatedById { get; set; }
+    public int? CreatedById { get; set; }
 
-    public short? UpdatedById { get; set; }
+    public int? UpdatedById { get; set; }
 
     public DateTime? ModifiedDate { get; set; }
 
