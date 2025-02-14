@@ -2,9 +2,6 @@
 using RepositoryLayer.Entities;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Teamo.Infrastructure.Data
 {
