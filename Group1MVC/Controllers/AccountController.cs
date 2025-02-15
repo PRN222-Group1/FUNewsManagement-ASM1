@@ -27,12 +27,14 @@ namespace Group1MVC.Controllers
         // GET: Account
         public async Task<IActionResult> Index()
         {
+            // TODO: View list of accounts
             throw new NotImplementedException();
         }
 
         // GET: Account/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            // TODO: View account details
             throw new NotImplementedException();
         }
 
@@ -76,6 +78,7 @@ namespace Group1MVC.Controllers
 
                 }
 
+                // If is authenticated create a claims principal and sign in with that claims
                 if (isAuthenticated)
                 {
                     var principal = new ClaimsPrincipal(identity);
@@ -99,13 +102,14 @@ namespace Group1MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AccountName,AccountEmail,AccountRole,AccountPassword,Id")] SystemAccount systemAccount)
         {
+            // TODO: Create new account
             throw new NotImplementedException();
         }
 
         // GET: Account/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            throw new NotImplementedException();
+            return View(id);
         }
 
         // POST: Account/Edit/5
@@ -113,13 +117,14 @@ namespace Group1MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AccountName,AccountEmail,AccountRole,AccountPassword,Id")] SystemAccount systemAccount)
         {
+            // TODO: Update account
             throw new NotImplementedException();
         }
 
         // GET: Account/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            throw new NotImplementedException();
+            return View(id);
         }
 
         // POST: Account/Delete/5
@@ -127,6 +132,7 @@ namespace Group1MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            // TODO: Delete account
             throw new NotImplementedException();
         }
 
