@@ -1,5 +1,6 @@
 ﻿using BusinessServiceLayer.Interfaces;
 using BusinessServiceLayer.Services;
+using Group1MVC.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Data;
@@ -19,8 +20,12 @@ namespace Group1MVC.Extensions
             });
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Register AutoMapper
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+            // Register Services
             services.AddScoped<IAccountService, AccountService>();
-            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             // Configure Cookie
             services.Configure<CookiePolicyOptions>(options =>
