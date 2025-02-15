@@ -3,9 +3,9 @@ using RepositoryLayer.Entities;
 using System.Reflection;
 using System.Text.Json;
 
-namespace Teamo.Infrastructure.Data
+namespace RepositoryLayer.Data
 {
-    public static class ApplicationDbContextSeed
+    public static class FuNewsManagementContextSeed
     {
         public static async Task SeedAsync(FuNewsManagementContext context)
         {

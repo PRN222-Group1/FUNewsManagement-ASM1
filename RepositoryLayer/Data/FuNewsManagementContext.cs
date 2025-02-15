@@ -6,12 +6,7 @@ namespace RepositoryLayer.Data;
 
 public partial class FuNewsManagementContext : DbContext
 {
-    public FuNewsManagementContext()
-    {
-    }
-
-    public FuNewsManagementContext(DbContextOptions<FuNewsManagementContext> options)
-        : base(options)
+    public FuNewsManagementContext(DbContextOptions<FuNewsManagementContext> options) : base(options) 
     {
     }
 
@@ -28,7 +23,6 @@ public partial class FuNewsManagementContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 }

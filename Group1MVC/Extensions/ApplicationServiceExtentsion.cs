@@ -13,6 +13,7 @@ namespace Group1MVC.Extensions
             IConfiguration config)
         {
             // Registers the database context with the DI container
+            services.AddControllersWithViews();
             services.AddDbContext<FuNewsManagementContext>(opt =>
             {
                 opt.UseSqlServer(config.GetConnectionString("DefaultConnection"));

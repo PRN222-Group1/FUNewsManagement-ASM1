@@ -1,13 +1,10 @@
 using Group1MVC.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Data;
-using Teamo.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
 builder.Services.AddApplicationServices(builder.Configuration);
 
 var app = builder.Build();
@@ -45,7 +42,7 @@ try
     await dbContext.Database.MigrateAsync();
 
     // Seed the database with data
-    await ApplicationDbContextSeed.SeedAsync(dbContext);
+    await FuNewsManagementContextSeed.SeedAsync(dbContext);
 }
 catch (Exception ex)
 {
