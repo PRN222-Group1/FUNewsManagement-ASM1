@@ -1,0 +1,67 @@
+﻿@using BusinessServiceLayer.DTOs
+@using Group1MVC.Helpers
+@using Group1MVC.ViewModels
+@model Pagination<NewsArticleDTO>
+
+@{
+    ViewData["Title"] = "News Articles";
+
+    // Initialize search and sort properties
+    var filterModel = new FilterViewModel
+    {
+        SortOptions = new List<SortOption>
+        {
+            new SortOption { Value = "dateDesc", Text = "Newest First" },
+            new SortOption { Value = "dateAsc", Text = "Oldest First" },
+            new SortOption { Value = "titleAsc", Text = "Title (A-Z)" },
+            new SortOption { Value = "titleDesc", Text = "Title (Z-A)" }
+        },
+
+        SearchPlaceholder = "Search articles, authors...",
+        SearchQuery = (string) ViewData["CurrentFilter"],
+        SelectedSortOption = (string) ViewData["CurrentSort"],
+        PageNumber = (int) ViewData["CurrentPageNumber"],
+        PageSize = (int) ViewData["CurrentPageSize"],
+        PageCount = (int)ViewData["CurrentPageCount"],
+        SelectedCategory = (int?) ViewData["SelectedCategory"],
+        Categories = ViewBag.Categories,
+    };
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <form asp-action="Index" method="get" class="d-flex align-items-center justify-content-between">
+                <!-- Search Input Group -->
+                <partial name="_SearchBar" model="@filterModel" />
+
+                <!-- Sort Dropdown -->
+                <partial name="_SortDropdown" model="@filterModel" />
+
+                <!-- Sort Dropdown -->
+                <partial name="_CategoryDropdown" model="@filterModel" />
+
+                <!-- Paginator -->
+                <partial name="_Paginator" model="@filterModel" />
+            </form>
+        </div>
+    </div>
+
+    <!-- Render News Article Cards -->
+    <div class="row">
+        @foreach (var article in Model.Data)
+        {
+            <partial name="_NewsArticleCard" model="article" />
+        }
+    </div>
+
+    <p class="text-center">
+        <a asp-action="Create" class="btn btn-success">Create New Article</a>
+    </p>
+</div>
