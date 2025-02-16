@@ -3,6 +3,7 @@ using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
+using RepositoryLayer.Specifications;
 using RepositoryLayer.Specifications.Categories;
 
 namespace BusinessServiceLayer.Services;
@@ -108,10 +109,13 @@ public class CategoriesService : ICategoriesService
 
     public async Task<string> createCategory(EditCategoriesentity createCategoriesEntity)
     {
+        int categoryCount = await _repository.CountAsync(); // Đếm số danh mục
+
         var category = new Category
         {
             CategoryName = createCategoriesEntity.CategoryName,
             CategoryDescription = createCategoriesEntity.CategoryDescription,
+            ParentCategoryId = categoryCount,
             IsActive = true
         };
 
@@ -133,7 +137,7 @@ public class CategoriesService : ICategoriesService
 
         List<CategoriesDTO> categoriesDtos = filteredCategories.Select(c => new CategoriesDTO
         {
-            ParentCategoryId = (int)c.ParentCategoryId,
+            ParentCategoryId = c.ParentCategoryId.GetValueOrDefault(),
             CategoryName = c.CategoryName,
             CategoryDescription = c.CategoryDescription,
             IsActive = (bool)c.IsActive,
@@ -141,4 +145,5 @@ public class CategoriesService : ICategoriesService
 
         return categoriesDtos;
     }
+
 }

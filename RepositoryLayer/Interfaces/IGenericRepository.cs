@@ -20,5 +20,7 @@ namespace RepositoryLayer.Interfaces
         Task<bool> SaveAllAsync ();
         Task<List<T>> GetAll();
         Task<int> SaveChangesAsync();
+
+        Task<int> CountAsync();
     }
 }
