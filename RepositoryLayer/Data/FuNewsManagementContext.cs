@@ -9,6 +9,7 @@ public partial class FuNewsManagementContext : DbContext
     public FuNewsManagementContext(DbContextOptions<FuNewsManagementContext> options) : base(options) 
     {
     }
+    
 
     public virtual DbSet<Category> Categories { get; set; }
 
