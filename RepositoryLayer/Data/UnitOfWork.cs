@@ -11,7 +11,7 @@ namespace RepositoryLayer.Data
     public class UnitOfWork : IUnitOfWork
     {
         private readonly FuNewsManagementContext _context;
-        private ConcurrentDictionary<string, object> _repositories;
+        private ConcurrentDictionary<string, object> _repositories = new ConcurrentDictionary<string, object>();
 
         /// <summary>
         /// Injects a DbContext instance to be used by all repositories.

@@ -3,7 +3,6 @@ using BusinessServiceLayer.Services;
 using Group1MVC.Extensions;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Data;
-using Teamo.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +26,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
@@ -47,7 +48,7 @@ try
     await dbContext.Database.MigrateAsync();
 
     // Seed the database with data
-    await ApplicationDbContextSeed.SeedAsync(dbContext);
+    await FuNewsManagementContextSeed.SeedAsync(dbContext);
 }
 catch (Exception ex)
 {

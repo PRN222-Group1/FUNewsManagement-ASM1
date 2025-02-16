@@ -12,6 +12,33 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+label {
+    min-width: 80px;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    color: gray;
+}
+
+a:visited {
+    color: gray;
+}
+
+a:hover {
+    color: black;
+}
+
+a:active {
+    color: cornflowerblue;
+}
+
+.logo {
+    color: antiquewhite !important;
+}
+
 html {
   position: relative;
   min-height: 100%;
@@ -19,4 +46,12 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+#sidebar {
+    height: 100%;
+}
+
+#content {
+    height: 100%;
 }
