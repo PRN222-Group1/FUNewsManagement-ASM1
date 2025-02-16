@@ -26,6 +26,7 @@ namespace Group1MVC.Extensions
 
             // Register Services
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<INewsArticleService, NewsArticleService>();
 
             // Configure Cookie
             services.Configure<CookiePolicyOptions>(options =>

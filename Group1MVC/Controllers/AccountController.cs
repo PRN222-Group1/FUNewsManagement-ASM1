@@ -75,7 +75,6 @@ namespace Group1MVC.Controllers
 
                         isAuthenticated = true;
                     }
-
                 }
 
                 // If is authenticated create a claims principal and sign in with that claims
@@ -83,7 +82,6 @@ namespace Group1MVC.Controllers
                 {
                     var principal = new ClaimsPrincipal(identity);
                     var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    Console.Write(User.Claims.FirstOrDefault().ToString());
                     return RedirectToAction("Index", "Home");
                 }
             }
