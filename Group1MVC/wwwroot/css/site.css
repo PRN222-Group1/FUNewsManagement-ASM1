@@ -18,6 +18,25 @@ label {
 
 a {
     cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    color: gray;
+}
+
+a:visited {
+    color: gray;
+}
+
+a:hover {
+    color: black;
+}
+
+a:active {
+    color: cornflowerblue;
+}
+
+.logo {
+    color: antiquewhite !important;
 }
 
 html {
@@ -27,4 +46,12 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+#sidebar {
+    height: 100%;
+}
+
+#content {
+    height: 100%;
 }
