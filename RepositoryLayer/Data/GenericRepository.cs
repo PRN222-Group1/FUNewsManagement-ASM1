@@ -120,6 +120,17 @@ namespace RepositoryLayer.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<List<T>> GetAll()
+        {
+            return await _context.Set<T>().ToListAsync();
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+           return await _context.SaveChangesAsync();
+        }
+        
+
         /// <summary>
         /// Return a true or false on whether the entity exists
         /// </summary>

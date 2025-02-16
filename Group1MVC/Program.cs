@@ -1,5 +1,6 @@
+using BusinessServiceLayer.Interfaces;
+using BusinessServiceLayer.Services;
 using Group1MVC.Extensions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Data;
 using Teamo.Infrastructure.Data;
@@ -9,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddApplicationServices(builder.Configuration);
+builder.Services.AddScoped<ICategoriesService, CategoriesService>();
+
 
 var app = builder.Build();
 
@@ -19,7 +22,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -29,7 +31,9 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Categories}/{action=Index}/{id?}");
+
+
 
 // Create a scope and call the service manually
 using var scope = app.Services.CreateScope();

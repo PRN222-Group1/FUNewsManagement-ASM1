@@ -14,6 +14,7 @@ public partial class FuNewsManagementContext : DbContext
         : base(options)
     {
     }
+    
 
     public virtual DbSet<Category> Categories { get; set; }
 
