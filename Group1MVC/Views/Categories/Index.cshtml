@@ -1,0 +1,60 @@
+﻿@model List<BusinessServiceLayer.DTOs.CategoriesDTO>
+
+@{
+ViewData["Title"] = "Quản lý Danh mục";
+}
+
+<h2>Quản lý Danh mục</h2>
+
+<!-- Hiển thị thông báo -->
+@if (TempData["SuccessMessage"] != null)
+{
+<div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (TempData["ErrorMessage"] != null)
+{
+<div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+
+<!-- Nút thêm danh mục -->
+<a asp-action="Create" class="btn btn-success">+ Thêm danh mục</a>
+
+<!-- Form tìm kiếm -->
+<form method="get" asp-action="Search" class="mt-3">
+    <input type="text" name="keyword" class="form-control d-inline w-50" placeholder="Nhập từ khóa tìm kiếm..." />
+    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+</form>
+
+<!-- Bảng danh sách danh mục -->
+<table class="table table-bordered mt-3">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Tên danh mục</th>
+        <th>Mô tả</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var category in Model)
+    {
+    <tr>
+        <td>@category.ParentCategoryId</td>
+        <td>@category.CategoryName</td>
+        <td>@category.CategoryDescription</td>
+        <td>@(category.IsActive ? "Active" : "Inactive")</td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@(category.ParentCategoryId)" class="btn btn-warning btn-sm">Sửa</a>
+
+            <!-- Nút xóa -->
+            <form asp-action="Delete" asp-route-id="@category.ParentCategoryId" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa danh mục này?')">
+                    Xóa
+                </button>
+            </form>
+        </td>
+    </tr>
+    }
+    </tbody>
+</table>

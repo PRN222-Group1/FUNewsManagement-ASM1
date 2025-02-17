@@ -1,0 +1,22 @@
+﻿@model RepositoryLayer.Specifications.Categories.EditCategoriesentity
+
+@{
+    ViewData["Title"] = "Thêm danh mục";
+}
+
+<h2>Thêm Danh Mục</h2>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="CategoryName">Tên danh mục</label>
+        <input type="text" asp-for="CategoryName" class="form-control" required />
+    </div>
+
+    <div class="form-group">
+        <label for="CategoryDescription">Mô tả</label>
+        <textarea asp-for="CategoryDescription" class="form-control"></textarea>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Lưu</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Quay lại</a>
+</form>
