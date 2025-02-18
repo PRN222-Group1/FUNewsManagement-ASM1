@@ -15,11 +15,13 @@ namespace Group1MVC.Controllers
     {
         private readonly FuNewsManagementContext _context;
         private readonly INewsArticleService _newsArticleService;
+        private readonly IAccountService _accountService;
 
-        public NewsArticlesController(FuNewsManagementContext context, INewsArticleService newsArticleService)
+        public NewsArticlesController(FuNewsManagementContext context, INewsArticleService newsArticleService, IAccountService accountService)
         {
             _context = context;
             _newsArticleService = newsArticleService;
+            _accountService = accountService;
         }
 
         // GET: NewsArticles
@@ -47,48 +49,53 @@ namespace Group1MVC.Controllers
         }
 
         // GET: NewsArticles/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var newsArticle = await _newsArticleService.GetNewsArticleByIdAsync(id);
 
-            var newsArticle = await _context.NewsArticles
-                .Include(n => n.Category)
-                .Include(n => n.CreatedBy)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (newsArticle == null)
-            {
-                return NotFound();
-            }
+            if (newsArticle == null) return NotFound();
 
             return View(newsArticle);
         }
 
         // GET: NewsArticles/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "CategoryDescription");
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "Id", "Id");
+            var categories = await _newsArticleService.GetAllCategories();
+            var tags = await _newsArticleService.GetAllTags();
+
+            ViewBag.Categories = categories;
+            ViewBag.Tags = tags;
+
             return View();
         }
 
         // POST: NewsArticles/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById,UpdatedById,ModifiedDate,Id")] NewsArticle newsArticle)
+        public async Task<IActionResult> Create([Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,TagIds")] NewsArticleToAddDTO newsArticle)
         {
+            var result = false;
+
+            // Set created and modified date to current time
+            newsArticle.CreatedDate = DateTime.UtcNow;
+            newsArticle.ModifiedDate = DateTime.UtcNow;
+
+            // Get currently logged in user
+            var email = User.Claims.FirstOrDefault().Value;
+            var currentUser = await _accountService.GetUserByEmailAsync(email);
+
+            // Set current user to the current logged in staff
+            newsArticle.CreatedById = currentUser.Id;
+            newsArticle.UpdatedById = currentUser.Id;
+
             if (ModelState.IsValid)
             {
-                _context.Add(newsArticle);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                result = await _newsArticleService.CreateNewsArticle(newsArticle);
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "CategoryDescription", newsArticle.CategoryId);
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "Id", "Id", newsArticle.CreatedById);
+
+            if (result) return RedirectToAction("Index", "NewsArticles");
+
             return View(newsArticle);
         }
 
@@ -111,8 +118,6 @@ namespace Group1MVC.Controllers
         }
 
         // POST: NewsArticles/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById,UpdatedById,ModifiedDate,Id")] NewsArticle newsArticle)

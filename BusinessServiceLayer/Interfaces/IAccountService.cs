@@ -6,6 +6,7 @@ namespace BusinessServiceLayer.Interfaces
     public interface IAccountService
     {
         Task<SystemAccountDTO?> LoginAsync(LoginPayload loginDTO);
-        Task<bool> CheckEmailExisted(string email);
+        Task<bool> CheckEmailExistedAsync(string email);
+        Task<SystemAccountDTO?> GetUserByEmailAsync(string email);
     }
 }

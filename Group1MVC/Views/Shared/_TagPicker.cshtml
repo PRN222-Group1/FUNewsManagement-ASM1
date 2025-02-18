@@ -1,0 +1,46 @@
+﻿@using BusinessServiceLayer.DTOs
+@model IReadOnlyList<TagDTO>
+
+<div>
+    <label class="control-label">Tags</label>
+
+    <!-- Checkboxes for selecting tags -->
+    <div id="tagCheckboxes">
+        @foreach (var tag in Model)
+        {
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="@tag.Id" id="tag_@tag.Id" data-tag-id="@tag.Id">
+                <label class="form-check-label" for="tag_@tag.Id">
+                    @tag.TagName
+                </label>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    let selectedTagIds = [];
+    const tagCheckboxes = document.querySelectorAll('#tagCheckboxes input[type="checkbox"]');
+    const tagIdsHiddenInput = document.getElementById('TagIds');
+
+    // Add event listener to each checkbox
+    tagCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function () {
+            const tagId = this.getAttribute('data-tag-id');
+
+            if (this.checked) {
+                // Add tag ID to the selectedTagIds array
+                if (!selectedTagIds.includes(tagId)) {
+                    selectedTagIds.push(tagId);
+                }
+            } else {
+                // Remove tag ID from the selectedTagIds array
+                selectedTagIds = selectedTagIds.filter(id => id != tagId);
+            }
+
+            // Update the hidden field with selected tag IDs (comma-separated)
+            tagIdsHiddenInput.value = selectedTagIds.join(',');
+            console.log(selectedTagIds.join(','));
+        });
+    });
+</script>

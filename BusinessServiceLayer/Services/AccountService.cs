@@ -31,12 +31,25 @@ namespace BusinessServiceLayer.Services
             return _mapper.Map<SystemAccount, SystemAccountDTO>(user);
         }
 
-        public async Task<bool> CheckEmailExisted(string email)
+        public async Task<bool> CheckEmailExistedAsync(string email)
         {
             var spec = new AccountSpecification(email);
             var user = await _accountService.GetEntityWithSpec(spec);
             if (user != null) return true;
             return false;
+        }
+
+        public async Task<SystemAccountDTO?> GetUserByEmailAsync(string email)
+        {
+            var spec = new AccountSpecification(email);
+            var user = await _accountService.GetEntityWithSpec(spec);
+
+            if (user == null) 
+            {
+                return null;
+            }
+
+            return _mapper.Map<SystemAccount, SystemAccountDTO>(user);
         }
     }
 }

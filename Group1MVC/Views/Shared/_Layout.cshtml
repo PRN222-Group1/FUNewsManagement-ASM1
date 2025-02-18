@@ -7,50 +7,40 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Group1MVC.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/fontawesome/css/all.min.css">
 </head>
 <body>
-    <header>
-        <!-- Top Navbar with Login button -->
-        <nav class="navbar navbar-expand-lg navbar-light py-3 bg-light shadow-sm">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
-                            <a class="btn btn-outline-primary" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-
     <!-- Sidebar and Main Content Section -->
     <div class="d-flex">
         <!-- Sidebar -->
-        <nav id="sidebar" class="bg-light border-end min-vh-100">
-            <div class="sidebar-header py-3 px-4 bg-primary text-white">
-                <a asp-area="" asp-controller="Home" asp-action="Index"><h4 class="fw-bold logo">FU News Management</h4></a>
+        <nav id="sidebar" class="bg-light border-end min-vh-100 shadow-sm">
+            <div class="sidebar-header py-4 px-4 bg-primary text-white">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="text-decoration-none text-white">
+                    <h4 class="fw-bold logo mb-0">FU News Management</h4>
+                </a>
             </div>
-            <ul class="list-unstyled components p-3">
-                <li class="mb-2">
-                    <a asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            <ul class="list-unstyled components p-4">
+                <li class="mb-3 sidenav">
+                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="fa fa-home me-2"></i> Home
+                    </a>
                 </li>
-                <li class="mb-2">
-                    <a asp-area="" asp-controller="NewsArticles" asp-action="Index">News Articles</a>
+                <li class="mb-3 sidenav">
+                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
+                        <i class="fa fa-newspaper me-2"></i> News Articles
+                    </a>
                 </li>
-                <li class="mb-2">
-                    <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <li class="mb-3 sidenav">
+                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Account" asp-action="Login">
+                        <i class="fa fa-sign-in me-2"></i> Login
+                    </a>
                 </li>
             </ul>
         </nav>
 
         <!-- Main content -->
         <main id="content" class="w-100 h-100">
-            <div class="container">
+            <div class="container mt-5">
                 <main role="main" class="pb-3">
                     @RenderBody()
                 </main>
@@ -58,7 +48,7 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-muted bg-light">
         <div class="container">
             &copy; 2025 - FU News Management - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>

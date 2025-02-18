@@ -1,0 +1,12 @@
+﻿@using BusinessServiceLayer.DTOs
+@model IReadOnlyList<CategoryDTO>
+
+<div class="form-group d-flex align-items-center">
+    <label for="CategoryId">Category: </label>
+    <select name="CategoryId" class="form-control">
+        @foreach (var option in @Model)
+        {
+            <option value="@option.Id">@option.CategoryName</option>
+        }
+    </select>
+</div>

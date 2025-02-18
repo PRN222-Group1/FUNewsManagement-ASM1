@@ -46,5 +46,38 @@ namespace BusinessServiceLayer.Services
             var categories = await _unitOfWork.Repository<Category>().ListAllAsync();
             return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryDTO>>(categories);
         }
+
+        public async Task<bool> CreateNewsArticle(NewsArticleToAddDTO newsArticle)
+        {
+            // Split the TagIds string by commas and convert to a list of integers
+            var tagIdList = newsArticle.TagIds
+                .Split(',')
+                .Select(id => int.Parse(id))
+                .ToList();
+
+            // Create a in-memory list of tags
+            var tagList = new List<Tag>();
+
+            foreach (int tagId in tagIdList)
+            {
+                var tag = await _unitOfWork.Repository<Tag>().GetByIdAsync(tagId);
+                tagList.Add(tag);
+            }
+
+            var newsArticleToAdd = _mapper.Map<NewsArticleToAddDTO, NewsArticle>(newsArticle);
+            newsArticleToAdd.Tags = tagList;
+
+            // Add news article and save changes to the database
+            _unitOfWork.Repository<NewsArticle>().Add(newsArticleToAdd);
+            var result = await _unitOfWork.Complete();
+            return result;
+        }
+
+        public async Task<IReadOnlyList<TagDTO>> GetAllTags()
+        {
+            var tags = await _unitOfWork.Repository<Tag>().ListAllAsync();
+
+            return _mapper.Map<IReadOnlyList<Tag>, IReadOnlyList<TagDTO>>(tags);
+        }
     }
 }
