@@ -1,6 +1,7 @@
 ﻿@using BusinessServiceLayer.DTOs
 @using Group1MVC.Helpers
 @using Group1MVC.ViewModels
+@using RepositoryLayer.Enums
 @model Pagination<NewsArticleDTO>
 
 @{
@@ -26,6 +27,8 @@
         SelectedCategory = (int?) ViewData["SelectedCategory"],
         Categories = ViewBag.Categories,
     };
+
+    var role = (string)ViewData["Role"];
 }
 
 <div class="container mt-5">
@@ -60,8 +63,9 @@
             <partial name="_NewsArticleCard" model="article" />
         }
     </div>
-
-    <p class="text-center">
-        <a asp-action="Create" class="btn btn-success">Create New Article</a>
-    </p>
+    @if (role.Equals(Role.Staff.ToString())) {
+        <p class="text-center">
+            <a asp-action="Create" class="btn btn-success">Create New Article</a>
+        </p>
+    }
 </div>

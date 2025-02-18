@@ -12,5 +12,10 @@ namespace RepositoryLayer.Specifications.Categories
         {
             AddInclude(c => c.ParentCategory);
         }
+
+        public CategorySpecification(int id) : base(x => x.Id == id)
+        {
+            AddInclude(c => c.NewsArticles);
+        }
     }
 }

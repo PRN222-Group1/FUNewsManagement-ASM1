@@ -26,11 +26,9 @@ namespace Group1MVC.Controllers
         // GET: NewsArticles
         public async Task<IActionResult> Index(NewsArticleSpecParams specParams)
         {
-            // Get currently logged in user
-            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
 
             // Show all news for staff but only published news for lecturer
-            if (role == Role.Staff.ToString())
+            if (GetUserRole() == Role.Staff.ToString())
             {
                 specParams.Status = null;
             }
@@ -56,6 +54,7 @@ namespace Group1MVC.Controllers
 
             ViewBag.Categories= categories;
             ViewData["SelectedCategory"] = specParams.CategoryId;
+            ViewData["Role"] = GetUserRole();
 
             return View(paginatedResult);
         }
@@ -64,6 +63,8 @@ namespace Group1MVC.Controllers
         public async Task<IActionResult> Details(int id)
         {
             var newsArticle = await _newsArticleService.GetNewsArticleByIdAsync(id);
+
+            ViewData["Role"] = GetUserRole();
 
             if (newsArticle == null) return NotFound();
 
@@ -179,6 +180,12 @@ namespace Group1MVC.Controllers
             }
 
             return View();
+        }
+
+        // Get the current user role
+        private string GetUserRole()
+        {
+            return User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
         }
     }
 }

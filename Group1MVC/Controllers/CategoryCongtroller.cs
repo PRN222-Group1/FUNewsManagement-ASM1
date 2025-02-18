@@ -106,12 +106,13 @@ namespace Group1MVC.Controllers
 
             if (result)
             {
-                TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
+                TempData["SuccessMessage"] = "Update successfully!";
                 return RedirectToAction(nameof(Index));
             }
             else
             {
-                TempData["ErrorMessage"] = "Cập nhật danh mục thất bại!";
+                TempData["ErrorMessage"] = "Update failed!";
+                return RedirectToAction(nameof(Index));
             }
 
             return View();
@@ -129,10 +130,9 @@ namespace Group1MVC.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = result;
+                TempData["ErrorMessage"] = "Delete failed due to the category is being applied to one or more news articles!";
+                return RedirectToAction(nameof(Index));
             }
-
-            return View();
         }
     }
 }
