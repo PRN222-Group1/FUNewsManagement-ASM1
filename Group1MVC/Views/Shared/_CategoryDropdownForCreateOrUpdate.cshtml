@@ -1,0 +1,9 @@
+﻿@using Microsoft.AspNetCore.Mvc.Rendering
+@using BusinessServiceLayer.DTOs
+@model IReadOnlyList<CategoryDTO>
+
+<div class="form-group d-flex align-items-center">
+    <label for="CategoryId" class="form-label">Category: </label>
+    <select asp-items="@(new SelectList(Model, "Id", "CategoryName", ViewBag.SelectedCategoryId))" name="CategoryId" class="form-control">
+    </select>
+</div>

@@ -17,10 +17,7 @@ namespace RepositoryLayer.Interfaces
         void Update(T entity);
         void Delete(T entity);
         bool Exists(int id);
-        Task<bool> SaveAllAsync ();
-        Task<List<T>> GetAll();
-        Task<int> SaveChangesAsync();
-
+        Task<bool> SaveAllAsync();
         Task<int> CountAsync();
     }
 }

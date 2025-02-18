@@ -5,7 +5,7 @@
         public int? CategoryId { get; set; } = null;
         public string Sort { get; set; }
 
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
 
         private string _search;
 

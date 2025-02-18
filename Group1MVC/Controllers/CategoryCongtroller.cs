@@ -1,4 +1,5 @@
-﻿using BusinessServiceLayer.Interfaces;
+﻿using BusinessServiceLayer.DTOs;
+using BusinessServiceLayer.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Specifications.Categories;
 
@@ -8,112 +9,130 @@ namespace Group1MVC.Controllers
     {
         private readonly ICategoriesService _categoriesService;
 
-
         public CategoriesController(ICategoriesService categoriesService)
         {
             _categoriesService = categoriesService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CategorySpecParams specParams)
         {
-            var categories = await _categoriesService.getAll();
+            specParams.Status = null;
+
+            var categories = await _categoriesService.GetCategoriesAsync(specParams);
+
+            var cleanSpec = new CategorySpecParams();
+            cleanSpec.Status = null;
+
+            var parentCategories = await _categoriesService.GetCategoriesAsync(cleanSpec);
+
+            ViewData["CurrentFilter"] = specParams.Search;
+
+            ViewBag.Categories = parentCategories;
+            ViewData["SelectedCategory"] = specParams.CategoryId;
+
             return View(categories);
         }
 
-        public async Task<IActionResult> NewsByCategory(int id)
+        public async Task<IActionResult> Create()
         {
-            var newsArticles = await _categoriesService.getNewsArticlesByID(id);
-            return View(newsArticles);
-        }
+            var specParams = new CategorySpecParams();
+            specParams.Status = true;
+            var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+            ViewBag.Categories = parentCategories;
+            ViewData["Action"] = "Create";
 
-        public IActionResult Create()
-        {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(EditCategoriesentity model)
+        public async Task<IActionResult> Create([Bind("CategoryName,CategoryDescription,CategoryId")] CategoryToAddOrUpdateDTO category)
         {
-            if (!ModelState.IsValid)
+            var result = false;
+
+            category.Status = true;
+
+            if (ModelState.IsValid)
             {
-                return View(model);
+                result = await _categoriesService.CreateCategoryAsync(category);
             }
 
-            await _categoriesService.createCategory(model);
-            TempData["SuccessMessage"] = "Thêm danh mục thành công!";
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Create Category Successfully!";
+                return RedirectToAction("Index");
+            }
 
-            return RedirectToAction("Index"); // Load lại danh sách
+            return View(category);
         }
 
 
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var categoryList = await _categoriesService.getAll();
-            var category = categoryList.FirstOrDefault(c => c.ParentCategoryId == id);
+            var specParams = new CategorySpecParams();
+            specParams.Status = true;
+            var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+
+            var category = await _categoriesService.GetCategoryByIdAsync(id);
 
             if (category == null)
             {
-                TempData["ErrorMessage"] = "Không tìm thấy danh mục!";
-                return RedirectToAction("Index");
+                return NotFound();
             }
 
-            var editModel = new EditCategoriesentity
+            ViewBag.Categories = parentCategories;
+            ViewData["Action"] = "Edit";
+            ViewBag.SelectedCategoryId = category.ParentCategoryId.Value;
+
+            var categoryToUpdate = new CategoryToAddOrUpdateDTO
             {
-                ParentCategoryId = id,
-                CategoryName = category.CategoryName ?? "Chưa có tên",
-                CategoryDescription = category.CategoryDescription ?? "Không có mô tả"
+                CategoryId = id,
+                CategoryName = category.CategoryName,
+                CategoryDescription = category.CategoryDescription,
+                Status = category.IsActive
             };
 
-            return View(editModel); 
+            return View(categoryToUpdate); 
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, EditCategoriesentity model)
+        public async Task<IActionResult> Edit(int id, [Bind("CategoryName,CategoryDescription,CategoryId,Status")] CategoryToAddOrUpdateDTO category)
         {
-            if (!ModelState.IsValid)
+            var result = false;
+            if (ModelState.IsValid)
             {
-                return View(model);
+                result = await _categoriesService.EditCategoryAsync(id, category);
             }
 
-            string result = await _categoriesService.editCategory(id, model);
-
-            if (result == "Edit category successfully")
+            if (result)
             {
                 TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
+                return RedirectToAction(nameof(Index));
             }
             else
             {
                 TempData["ErrorMessage"] = "Cập nhật danh mục thất bại!";
             }
 
-            return RedirectToAction("Index"); 
+            return View();
         }
-
-
-
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var result = await _categoriesService.deleteCategory(id);
+            var result = await _categoriesService.DeleteCategoryAsync(id);
 
-            if (result == "Delete Category successfully")
+            if (result)
             {
-                TempData["SuccessMessage"] = "Xóa danh mục thành công!";
+                TempData["SuccessMessage"] = "Delete successfully!";
+                return RedirectToAction("Index");
             }
             else
             {
                 TempData["ErrorMessage"] = result;
             }
 
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> Search(string keyword)
-        {
-            var result = await _categoriesService.searchCategory(keyword);
-            return View("Index", result);
+            return View();
         }
     }
 }

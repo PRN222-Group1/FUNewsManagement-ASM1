@@ -41,7 +41,11 @@ namespace Group1MVC.Controllers
         // GET: Account/Login
         public IActionResult Login()
         {
-            return View();
+            var loginPayload = new LoginPayload() { 
+                AccountEmail = "",
+                AccountPassword = ""
+            };
+            return View(loginPayload);
         }
 
         // POST: Account/Login

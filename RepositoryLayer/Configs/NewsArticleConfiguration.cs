@@ -38,13 +38,13 @@ namespace RepositoryLayer.Configs
                         .HasOne(nt => nt.Tag)
                         .WithMany()
                         .HasForeignKey(nt => nt.TagId)
-                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_NewsTag_Tag"),
                     j => j
                         .HasOne(nt => nt.NewsArticle)
                         .WithMany()
                         .HasForeignKey(nt => nt.NewsArticleId)
-                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK_NewsTag_NewsArticle"),
                     j =>
                     {

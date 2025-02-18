@@ -3,7 +3,6 @@ using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
-using RepositoryLayer.Specifications;
 using RepositoryLayer.Specifications.Categories;
 
 namespace BusinessServiceLayer.Services;
@@ -11,139 +10,77 @@ namespace BusinessServiceLayer.Services;
 public class CategoriesService : ICategoriesService
 {
     private readonly IGenericRepository<Category> _repository;
+    private readonly IMapper _mapper;
 
-    public CategoriesService(IGenericRepository<Category> repository)
+    public CategoriesService(IGenericRepository<Category> repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
-    public async Task<List<CategoriesDTO>> getAll()
+    public async Task<IReadOnlyList<CategoryDTO>> GetCategoriesAsync(CategorySpecParams specParams)
     {
-        var categories = await _repository.GetAll();
-        List<CategoriesDTO> categoriesDtos = categories.Select(category => new CategoriesDTO()
-        {
-            CategoryDescription = category.CategoryDescription,
-            IsActive = category.IsActive ?? false,
-            ParentCategoryId = category.ParentCategoryId ?? 0,
-            CategoryName = category.CategoryName ?? "No Name"
-        }).ToList();
-        return categoriesDtos;
+        var spec = new CategorySpecification(specParams);
+        var categories = await _repository.ListAsync(spec);
+
+        return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryDTO>>(categories);
     }
 
-    public async Task<List<NewsArticlesDTO>> getNewsArticlesByID(int idCategory)
+    public async Task<bool> DeleteCategoryAsync(int id)
     {
-        Category category = await _repository.GetByIdAsync(idCategory);
-
-        if (category == null)
-            throw new Exception("Category not found");
-
-        List<NewsArticle> newsArticles = category.NewsArticles.ToList();
-
-        List<NewsArticlesDTO> newsDTOs = newsArticles.Select(news => new NewsArticlesDTO
-        {
-            NewsTitle = news.NewsTitle ?? "No Title",
-            Headline = news.Headline,
-            CreatedDate = news.CreatedDate ?? DateTime.MinValue,
-            NewsContent = news.NewsContent ?? "No Content",
-            NewsSource = news.NewsSource ?? "N/A",
-            CategoryId = news.CategoryId ?? 0,
-            NewsStatus = news.NewsStatus ?? false,
-            CreatedById = news.CreatedById ?? 0,
-            UpdatedById = news.UpdatedById ?? 0,
-            ModifiedDate = news.ModifiedDate ?? DateTime.MinValue,
-
-            CategoryName = category.CategoryName,
-            CategoryDescription = category.CategoryDescription,
-            ParentCategoryId = category.ParentCategoryId,
-            IsActive = category.IsActive ?? false,
-
-            AccountName = news.CreatedBy?.AccountName ?? "Unknown",
-            AccountEmail = news.CreatedBy?.AccountEmail ?? "Unknown",
-            AccountRole = news.CreatedBy?.AccountRole ?? 0,
-            AccountPassword = "Hidden"
-        }).ToList();
-
-        return newsDTOs;
-    }
-
-    public async Task<string> deleteCategory(int idcategory)
-    {
-        Category category = await _repository.GetByIdAsync(idcategory);
+        bool result = false;
+        var category = await _repository.GetByIdAsync(id);
 
         if (category == null)
         {
-            return "Category not found";
+            return result;
         }
 
-        if (category.NewsArticles.Count == 0)
-        {
-            category.IsActive = false;
-            _repository.Update(category);
-            await _repository.SaveChangesAsync();
-
-            return "Delete Category successfully";
-        }
-
-        return "Delete Category failed: Category still contains news articles.";
-    }
-
-
-    public async Task<string> editCategory(int idcategory, EditCategoriesentity editCategoriesentity)
-    {
-        Category category = await _repository.GetByIdAsync((int)editCategoriesentity.ParentCategoryId);
-
-        if (category == null || category.IsActive == false)
-        {
-            return "Edit category failed";
-        }
-
-        category.CategoryName = editCategoriesentity.CategoryName;
-        category.CategoryDescription = editCategoriesentity.CategoryDescription;
+        category.IsActive = false;
 
         _repository.Update(category);
-        await _repository.SaveChangesAsync();
+        result = await _repository.SaveAllAsync();
 
-        return "Edit category successfully";
+        return result;
     }
 
 
-    public async Task<string> createCategory(EditCategoriesentity createCategoriesEntity)
+    public async Task<bool> EditCategoryAsync(int id, CategoryToAddOrUpdateDTO category)
     {
-        int categoryCount = await _repository.CountAsync(); // Đếm số danh mục
+        bool result = false;
+        var categoryToUpdate = await _repository.GetByIdAsync(id);
 
-        var category = new Category
+        if (categoryToUpdate == null)
         {
-            CategoryName = createCategoriesEntity.CategoryName,
-            CategoryDescription = createCategoriesEntity.CategoryDescription,
-            ParentCategoryId = categoryCount,
-            IsActive = true
-        };
+            return result;
+        }
 
-        _repository.Add(category);
-        await _repository.SaveChangesAsync();
+        categoryToUpdate.CategoryName = category.CategoryName;
+        categoryToUpdate.CategoryDescription = category.CategoryDescription;
+        categoryToUpdate.ParentCategoryId = category.CategoryId;
+        categoryToUpdate.IsActive = category.Status;
 
-        return "Create category successfully";
+        _repository.Update(categoryToUpdate);
+        result = await _repository.SaveAllAsync();
+
+        return result;
     }
 
-    public async Task<List<CategoriesDTO>> searchCategory(string keyword)
+
+    public async Task<bool> CreateCategoryAsync(CategoryToAddOrUpdateDTO category)
     {
-        var categories = await _repository.GetAll();
+        var result = false;
+        var categoryToAdd = _mapper.Map<CategoryToAddOrUpdateDTO, Category>(category);
 
-        var filteredCategories = categories
-            .Where(c => c.CategoryName.ToLower().Contains(keyword.ToLower()) ||
-                        c.CategoryDescription.ToLower().Contains(keyword.ToLower()) ||
-                        (c.ParentCategoryId.HasValue && c.ParentCategoryId.ToString() == keyword))
-            .ToList();
+        _repository.Add(categoryToAdd);
+        result = await _repository.SaveAllAsync();
 
-        List<CategoriesDTO> categoriesDtos = filteredCategories.Select(c => new CategoriesDTO
-        {
-            ParentCategoryId = c.ParentCategoryId.GetValueOrDefault(),
-            CategoryName = c.CategoryName,
-            CategoryDescription = c.CategoryDescription,
-            IsActive = (bool)c.IsActive,
-        }).ToList();
-
-        return categoriesDtos;
+        return result;
     }
 
+    public async Task<CategoryDTO> GetCategoryByIdAsync(int id)
+    {
+        var category = await _repository.GetByIdAsync(id);
+        return _mapper.Map<Category, CategoryDTO>(category);
+    }
 }
