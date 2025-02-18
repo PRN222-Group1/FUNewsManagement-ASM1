@@ -5,17 +5,12 @@ namespace BusinessServiceLayer.Interfaces;
 
 public interface ICategoriesService
 {
-    /*
-     * get all categories
-     */
-    Task<List<CategoriesDTO>> getAll();
-    
-    Task<List<NewsArticlesDTO>> getNewsArticlesByID(int idCategory);
+    Task<IReadOnlyList<CategoryDTO>> GetCategoriesAsync(CategorySpecParams specParams);
+    Task<CategoryDTO> GetCategoryByIdAsync(int id);
 
-    Task<string> deleteCategory(int idcategory);
+    Task<bool> DeleteCategoryAsync(int id);
 
-    Task<string> editCategory(int idcategory, EditCategoriesentity editCategoriesentity);
+    Task<bool> EditCategoryAsync(int id, CategoryToAddOrUpdateDTO category);
 
-    Task<string> createCategory(EditCategoriesentity createCategoriesEntity);
-    Task<List<CategoriesDTO>> searchCategory(string keyword);
+    Task<bool> CreateCategoryAsync(CategoryToAddOrUpdateDTO category);
 }

@@ -1,20 +1,3 @@
-﻿@model RepositoryLayer.Specifications.Categories.EditCategoriesentity
+﻿@model BusinessServiceLayer.DTOs.CategoryToAddOrUpdateDTO
 
-<h2>Sửa danh mục</h2>
-
-<form asp-action="Edit" asp-route-id="@Model.ParentCategoryId" method="post">
-    <input type="hidden" asp-for="ParentCategoryId" /> <!-- ✅ Gửi ID chính xác -->
-
-    <div class="form-group">
-        <label for="CategoryName">Tên danh mục</label>
-        <input type="text" asp-for="CategoryName" class="form-control" required />
-    </div>
-
-    <div class="form-group">
-        <label for="CategoryDescription">Mô tả</label>
-        <textarea asp-for="CategoryDescription" class="form-control"></textarea>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Cập nhật</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Quay lại</a>
-</form>
+<partial name="_CategoryCreateOrEditForm" model="Model" />

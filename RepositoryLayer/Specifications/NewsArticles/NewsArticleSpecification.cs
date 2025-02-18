@@ -11,7 +11,7 @@ namespace RepositoryLayer.Specifications.NewsArticles
             || x.CreatedBy.AccountName.Contains(specParams.Search))
             && (!specParams.CategoryId.HasValue 
             || x.CategoryId == specParams.CategoryId)
-            && x.NewsStatus == specParams.Status
+            && (!specParams.Status.HasValue || x.NewsStatus == specParams.Status)
             )
         {
             AddInclude(na => na.CreatedBy);

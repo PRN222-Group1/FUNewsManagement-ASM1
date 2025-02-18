@@ -1,13 +1,12 @@
 ﻿using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
 using Group1MVC.Helpers;
-using Group1MVC.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using RepositoryLayer.Data;
-using RepositoryLayer.Entities;
+using RepositoryLayer.Enums;
 using RepositoryLayer.Specifications.NewsArticles;
+using System.Security.Claims;
 
 namespace Group1MVC.Controllers
 {
@@ -27,6 +26,19 @@ namespace Group1MVC.Controllers
         // GET: NewsArticles
         public async Task<IActionResult> Index(NewsArticleSpecParams specParams)
         {
+            // Get currently logged in user
+            var role = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+            // Show all news for staff but only published news for lecturer
+            if (role == Role.Staff.ToString())
+            {
+                specParams.Status = null;
+            }
+            else
+            {
+                specParams.Status = true;
+            }
+
             var newsArticles = await _newsArticleService.GetNewsArticlesAsync(specParams);
 
             var count = await _newsArticleService.CountNewsArticlesAsync(specParams);

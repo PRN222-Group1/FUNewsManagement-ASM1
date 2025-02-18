@@ -9,8 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddApplicationServices(builder.Configuration);
-builder.Services.AddScoped<ICategoriesService, CategoriesService>();
-
 
 var app = builder.Build();
 
@@ -32,7 +30,7 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Categories}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 
 

@@ -1,10 +1,9 @@
-﻿namespace RepositoryLayer.Specifications.NewsArticles
+﻿namespace RepositoryLayer.Specifications.Categories
 {
-    public class NewsArticleSpecParams : PagingParams
+    public class CategorySpecParams
     {
         public int? CategoryId { get; set; } = null;
         public string Sort { get; set; }
-
         public bool? Status { get; set; }
 
         private string _search;
