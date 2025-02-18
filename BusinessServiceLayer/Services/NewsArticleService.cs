@@ -47,7 +47,7 @@ namespace BusinessServiceLayer.Services
             return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryDTO>>(categories);
         }
 
-        public async Task<bool> CreateNewsArticle(NewsArticleToAddDTO newsArticle)
+        public async Task<bool> CreateNewsArticleAsync(NewsArticleToAddOrUpdateDTO newsArticle)
         {
             // Split the TagIds string by commas and convert to a list of integers
             var tagIdList = newsArticle.TagIds
@@ -64,11 +64,56 @@ namespace BusinessServiceLayer.Services
                 tagList.Add(tag);
             }
 
-            var newsArticleToAdd = _mapper.Map<NewsArticleToAddDTO, NewsArticle>(newsArticle);
+            var newsArticleToAdd = _mapper.Map<NewsArticleToAddOrUpdateDTO, NewsArticle>(newsArticle);
             newsArticleToAdd.Tags = tagList;
 
             // Add news article and save changes to the database
             _unitOfWork.Repository<NewsArticle>().Add(newsArticleToAdd);
+            var result = await _unitOfWork.Complete();
+            return result;
+        }
+
+        public async Task<bool> UpdateNewsArticleAsync(int id, NewsArticleToAddOrUpdateDTO newsArticle)
+        {
+            // Split the TagIds string by commas and convert to a list of integers
+            var tagIdList = newsArticle.TagIds
+                .Split(',')
+                .Select(id => int.Parse(id))
+                .ToList();
+
+            // Create a in-memory list of tags
+            var tagList = new List<Tag>();
+
+            foreach (int tagId in tagIdList)
+            {
+                var tag = await _unitOfWork.Repository<Tag>().GetByIdAsync(tagId);
+                tagList.Add(tag);
+            }
+
+            var spec = new NewsArticleSpecification(id);
+            var newsArticleToUpdate = await _unitOfWork.Repository<NewsArticle>().GetEntityWithSpec(spec);
+            
+            newsArticleToUpdate.NewsTitle = newsArticle.NewsTitle;
+            newsArticleToUpdate.Headline = newsArticle.Headline;
+            newsArticleToUpdate.CategoryId = newsArticle.CategoryId;
+            newsArticleToUpdate.NewsContent = newsArticle.NewsContent;
+            newsArticleToUpdate.NewsStatus = newsArticle.NewsStatus;
+            newsArticleToUpdate.UpdatedById = newsArticle.UpdatedById;
+            newsArticleToUpdate.ModifiedDate = DateTime.UtcNow;
+            newsArticleToUpdate.Tags = tagList;
+
+            // Add news article and save changes to the database
+            _unitOfWork.Repository<NewsArticle>().Update(newsArticleToUpdate);
+            var result = await _unitOfWork.Complete();
+            return result;
+        }
+
+        public async Task<bool> DeleteNewsArticleAsync(int id)
+        {
+            var spec = new NewsArticleSpecification(id);
+            var newsArticleToUpdate = await _unitOfWork.Repository<NewsArticle>().GetEntityWithSpec(spec);
+
+            _unitOfWork.Repository<NewsArticle>().Delete(newsArticleToUpdate);
             var result = await _unitOfWork.Complete();
             return result;
         }

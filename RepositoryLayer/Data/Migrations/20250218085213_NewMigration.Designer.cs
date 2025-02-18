@@ -9,11 +9,11 @@ using RepositoryLayer.Data;
 
 #nullable disable
 
-namespace RepositoryLayer.Migrations
+namespace RepositoryLayer.Data.Migrations
 {
     [DbContext(typeof(FuNewsManagementContext))]
-    [Migration("20250215164329_01")]
-    partial class _01
+    [Migration("20250218085213_NewMigration")]
+    partial class NewMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -217,12 +217,14 @@ namespace RepositoryLayer.Migrations
                     b.HasOne("RepositoryLayer.Entities.NewsArticle", "NewsArticle")
                         .WithMany()
                         .HasForeignKey("NewsArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_NewsTag_NewsArticle");
 
                     b.HasOne("RepositoryLayer.Entities.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_NewsTag_Tag");
 

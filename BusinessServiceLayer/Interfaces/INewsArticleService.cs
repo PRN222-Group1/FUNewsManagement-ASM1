@@ -9,7 +9,9 @@ namespace BusinessServiceLayer.Interfaces
         Task<int> CountNewsArticlesAsync(NewsArticleSpecParams specParams);
         Task<NewsArticleDTO> GetNewsArticleByIdAsync(int newsId);
         Task<IReadOnlyList<CategoryDTO>> GetAllCategories();
-        Task<bool> CreateNewsArticle(NewsArticleToAddDTO newsArticle);
+        Task<bool> CreateNewsArticleAsync(NewsArticleToAddOrUpdateDTO newsArticle);
+        Task<bool> UpdateNewsArticleAsync(int id, NewsArticleToAddOrUpdateDTO newsArticle);
+        Task<bool> DeleteNewsArticleAsync(int id);
         Task<IReadOnlyList<TagDTO>> GetAllTags();
     }
 }

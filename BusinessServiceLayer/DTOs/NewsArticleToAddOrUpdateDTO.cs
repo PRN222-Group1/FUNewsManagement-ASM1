@@ -1,8 +1,6 @@
-﻿using RepositoryLayer.Entities;
-
-namespace BusinessServiceLayer.DTOs
+﻿namespace BusinessServiceLayer.DTOs
 {
-    public class NewsArticleToAddDTO
+    public class NewsArticleToAddOrUpdateDTO
     {
         public string? NewsTitle { get; set; }
 
@@ -16,7 +14,7 @@ namespace BusinessServiceLayer.DTOs
 
         public int? CategoryId { get; set; }
 
-        public bool? NewsStatus { get; set; } = true;
+        public bool NewsStatus { get; set; } = true;
 
         public int? CreatedById { get; set; }
 

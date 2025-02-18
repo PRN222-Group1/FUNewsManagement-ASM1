@@ -66,6 +66,7 @@ namespace Group1MVC.Controllers
 
             ViewBag.Categories = categories;
             ViewBag.Tags = tags;
+            ViewData["Action"] = "Create";
 
             return View();
         }
@@ -73,7 +74,7 @@ namespace Group1MVC.Controllers
         // POST: NewsArticles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,TagIds")] NewsArticleToAddDTO newsArticle)
+        public async Task<IActionResult> Create([Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
             var result = false;
 
@@ -88,10 +89,11 @@ namespace Group1MVC.Controllers
             // Set current user to the current logged in staff
             newsArticle.CreatedById = currentUser.Id;
             newsArticle.UpdatedById = currentUser.Id;
+            newsArticle.NewsStatus = true;
 
             if (ModelState.IsValid)
             {
-                result = await _newsArticleService.CreateNewsArticle(newsArticle);
+                result = await _newsArticleService.CreateNewsArticleAsync(newsArticle);
             }
 
             if (result) return RedirectToAction("Index", "NewsArticles");
@@ -100,59 +102,56 @@ namespace Group1MVC.Controllers
         }
 
         // GET: NewsArticles/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            var categories = await _newsArticleService.GetAllCategories();
+            var tags = await _newsArticleService.GetAllTags();
+            var newsArticle = await _newsArticleService.GetNewsArticleByIdAsync(id);
 
-            var newsArticle = await _context.NewsArticles.FindAsync(id);
+            // Prepare comma-separated Tag IDs for ViewBag
+            var selectedTagIds = string.Join(",", newsArticle.Tags.Select(tag => tag.Id.ToString()));
+
+            ViewBag.Categories = categories;
+            ViewBag.Tags = tags;
+            ViewBag.SelectedCategoryId = newsArticle.CategoryId;
+            ViewBag.SelectedTagIds = selectedTagIds;
+            ViewData["Action"] = "Edit";
+
+            var newsArticleToUpdate = new NewsArticleToAddOrUpdateDTO()
+            {
+                Headline = newsArticle.Headline,
+                NewsTitle = newsArticle.NewsTitle,
+                NewsContent = newsArticle.NewsContent,
+                CategoryId = newsArticle.CategoryId,
+                NewsStatus = newsArticle.NewsStatus,
+                NewsSource = newsArticle.NewsSource,
+                TagIds = selectedTagIds
+            };
+
             if (newsArticle == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "CategoryDescription", newsArticle.CategoryId);
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "Id", "Id", newsArticle.CreatedById);
-            return View(newsArticle);
+            
+            return View(newsArticleToUpdate);
         }
 
         // POST: NewsArticles/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("NewsTitle,Headline,CreatedDate,NewsContent,NewsSource,CategoryId,NewsStatus,CreatedById,UpdatedById,ModifiedDate,Id")] NewsArticle newsArticle)
+        public async Task<IActionResult> Edit(int id, [Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,UpdatedById,ModifiedDate,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
-            if (id != newsArticle.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(newsArticle);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NewsArticleExists(newsArticle.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                await _newsArticleService.UpdateNewsArticleAsync(id, newsArticle);
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "CategoryDescription", newsArticle.CategoryId);
-            ViewData["CreatedById"] = new SelectList(_context.SystemAccounts, "Id", "Id", newsArticle.CreatedById);
-            return View(newsArticle);
+            return View();
         }
 
-        // GET: NewsArticles/Delete/5
+        // POST: NewsArticles/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -160,36 +159,14 @@ namespace Group1MVC.Controllers
                 return NotFound();
             }
 
-            var newsArticle = await _context.NewsArticles
-                .Include(n => n.Category)
-                .Include(n => n.CreatedBy)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (newsArticle == null)
+            var result = await _newsArticleService.DeleteNewsArticleAsync(id.Value);
+
+            if (result)
             {
-                return NotFound();
+                return RedirectToAction(nameof(Index));
             }
 
-            return View(newsArticle);
-        }
-
-        // POST: NewsArticles/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var newsArticle = await _context.NewsArticles.FindAsync(id);
-            if (newsArticle != null)
-            {
-                _context.NewsArticles.Remove(newsArticle);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool NewsArticleExists(int id)
-        {
-            return _context.NewsArticles.Any(e => e.Id == id);
+            return View();
         }
     }
 }

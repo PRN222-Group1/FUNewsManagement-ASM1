@@ -18,9 +18,25 @@
         </div>
 
         <!-- Footer with buttons -->
-        <div class="card-footer bg-light text-center p-3">
-            <a class="btn btn-outline-primary btn-sm mx-2" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-            <a class="btn btn-outline-danger btn-sm mx-2" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+        <div class="card-footer bg-light text-center p-3 d-flex justify-content-center">
+            <a class="btn btn-outline-primary btn-md d-flex align-items-center mx-2" asp-action="Edit" asp-route-id="@Model.Id">
+                <i class="fa fa-edit"></i>
+            </a>
+
+            <!-- Form submission button, triggered only on confirmation -->
+            <form asp-action="Delete" method="post" onsubmit="return confirmSubmit();">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa fa-trash-can"></i>
+                </button>
+            </form>
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript function to show confirmation dialog
+    function confirmSubmit() {
+        return confirm("Are you sure you want to delete this news article?");
+    }
+</script>

@@ -214,12 +214,14 @@ namespace RepositoryLayer.Data.Migrations
                     b.HasOne("RepositoryLayer.Entities.NewsArticle", "NewsArticle")
                         .WithMany()
                         .HasForeignKey("NewsArticleId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_NewsTag_NewsArticle");
 
                     b.HasOne("RepositoryLayer.Entities.Tag", "Tag")
                         .WithMany()
                         .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("FK_NewsTag_Tag");
 

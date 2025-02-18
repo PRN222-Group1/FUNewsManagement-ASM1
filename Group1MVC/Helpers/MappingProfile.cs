@@ -11,7 +11,7 @@ namespace Group1MVC.Helpers
             CreateMap<SystemAccount, SystemAccountDTO>();
             CreateMap<Tag, TagDTO>();
             CreateMap<Category, CategoryDTO>();
-            CreateMap<NewsArticleToAddDTO, NewsArticle>();
+            CreateMap<NewsArticleToAddOrUpdateDTO, NewsArticle>();
             CreateMap<NewsArticle, NewsArticleDTO>()
                 .ForMember(na => na.AuthorName, o => o.MapFrom(s => s.CreatedBy.AccountName))
                 .ForMember(na => na.Tags, o => o.MapFrom(s => s.Tags))
