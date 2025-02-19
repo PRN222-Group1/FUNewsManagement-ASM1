@@ -1,10 +1,10 @@
-﻿namespace RepositoryLayer.Specifications.NewsArticles
+﻿namespace RepositoryLayer.Specifications.Account
 {
-    public class NewsArticleSpecParams : PagingParams
+    public class AccountSpecParams : PagingParams
     {
-        public int? CategoryId { get; set; } = null;
         public string Sort { get; set; }
-        public bool? Status { get; set; }
+
+        public int? Role { get; set; }
 
         private string _search;
 

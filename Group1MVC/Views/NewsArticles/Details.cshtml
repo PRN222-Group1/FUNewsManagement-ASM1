@@ -1,10 +1,12 @@
 ﻿@model BusinessServiceLayer.DTOs.NewsArticleDTO
+@using RepositoryLayer.Enums
 
 @{
     ViewData["Title"] = "Index";
 
     // Replace \n with <br /> for proper line breaks in HTML
     var formattedContent = Model.NewsContent?.Replace("\n", "<br />");
+    var role = (string)ViewData["Role"];
 }
 
 <div class="container mt-5">
@@ -22,18 +24,21 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h1 class="article-title display-4 font-weight-bold">@Model.NewsTitle</h1>
 
-                        <!-- Edit Button Next to Title -->
-                        <a class="btn btn-outline-primary btn-md d-flex align-items-center mx-2" asp-action="Edit" asp-route-id="@Model?.Id">
-                            <i class="fas fa-edit me-2"></i> Edit
-                        </a>
+                        @if (!string.IsNullOrEmpty(role) && role.Equals(Role.Staff.ToString()))
+                        {
+                            <!-- Edit Button Next to Title -->
+                            <a class="btn btn-outline-primary btn-md d-flex align-items-center mx-2" asp-action="Edit" asp-route-id="@Model?.Id">
+                                <i class="fas fa-edit me-2"></i> Edit
+                            </a>
 
-                        <!-- Delete button -->
-                        <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete this news article?')">
-                            <input type="hidden" name="id" value="@Model?.Id" />
-                            <button type="submit" class="btn btn-danger">
-                                <i class="fa fa-trash-can"></i>
-                            </button>
-                        </form>
+                            <!-- Delete button -->
+                            <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete this news article?')">
+                                <input type="hidden" name="id" value="@Model?.Id" />
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="fa fa-trash-can"></i>
+                                </button>
+                            </form>
+                        }
                     </div>
                     <p class="article-meta text-muted">
                         By <span class="text-primary">@Model.AuthorName</span> |

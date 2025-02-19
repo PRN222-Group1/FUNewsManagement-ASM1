@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessServiceLayer.DTOs;
 using RepositoryLayer.Entities;
+using RepositoryLayer.Enums;
 
 namespace Group1MVC.Helpers
 {
@@ -8,8 +9,11 @@ namespace Group1MVC.Helpers
     {
         public MappingProfile() 
         {
-            CreateMap<SystemAccount, SystemAccountDTO>();
+            CreateMap<SystemAccount, SystemAccountDTO>()
+                .ForMember(a => a.AccountRole, o => o.MapFrom(s => Enum.GetName(typeof(Role), s.AccountRole)));
+            CreateMap<SystemAccountToAddOrUpdateDTO, SystemAccount>();
             CreateMap<Tag, TagDTO>();
+            CreateMap<TagToAddOrUpdateDTO, Tag>();
             CreateMap<Category, CategoryDTO>()
                 .ForMember(c => c.ParentCategoryName, o => o.MapFrom(s => s.ParentCategory.CategoryName));
             CreateMap<CategoryToAddOrUpdateDTO, Category>()

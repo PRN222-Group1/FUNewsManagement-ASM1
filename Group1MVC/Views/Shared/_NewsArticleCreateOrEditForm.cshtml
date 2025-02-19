@@ -17,6 +17,12 @@
                 <div class="card-header bg-primary text-white">
                     <h4 class="mb-0">@action News Article</h4>
                 </div>
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+                }
+
                 <div class="card-body">
                     <form asp-action="@action" method="post" onsubmit="return confirm('Are you sure you want to @action this news article?')">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

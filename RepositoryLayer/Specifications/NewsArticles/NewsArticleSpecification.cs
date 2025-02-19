@@ -23,10 +23,10 @@ namespace RepositoryLayer.Specifications.NewsArticles
             {
                 switch (specParams.Sort)
                 {
-                    case "dateDesc":
+                    case "dateAsc":
                         AddOrderBy(na => na.CreatedDate);
                         break;
-                    case "dateAsc":
+                    case "dateDesc":
                         AddOrderByDescending(na => na.CreatedDate);
                         break;
                     case "titleDesc":
@@ -46,6 +46,16 @@ namespace RepositoryLayer.Specifications.NewsArticles
             : base(x => x.Id == newsId)
         {
             AddInclude(na => na.Tags);
+            AddInclude(na => na.CreatedBy);
+            AddInclude(na => na.Category);
+        }
+
+        public NewsArticleSpecification(DateTime? startDate, DateTime? endDate) : base(x =>
+            !(startDate.HasValue && endDate.HasValue) 
+            || (x.CreatedDate >= startDate && x.CreatedDate <= endDate)
+        )
+        {
+            AddOrderByDescending(na => na.CreatedDate);
             AddInclude(na => na.CreatedBy);
             AddInclude(na => na.Category);
         }

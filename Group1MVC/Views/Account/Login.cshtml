@@ -15,6 +15,10 @@
 <body>
     <div class="login-container">
         <h4>Login</h4>
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+        }
         <hr />
         <form asp-action="Login">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -30,6 +34,8 @@
                 <input asp-for="AccountPassword" class="form-control p-3 rounded border" type="password" placeholder="Please enter password" />
                 <span asp-validation-for="AccountPassword" class="text-danger"></span>
             </div>
+
+            <input type="hidden" asp-for="ReturnUrl" value="@ViewData["ReturnUrl"]" />
 
             <div class="form-group mt-3">
                 <input type="submit" value="Login" class="btn btn-custom w-100" />

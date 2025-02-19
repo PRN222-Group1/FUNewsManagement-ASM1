@@ -1,5 +1,6 @@
 ﻿using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Specifications.Categories;
 
@@ -7,13 +8,14 @@ namespace Group1MVC.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly ICategoriesService _categoriesService;
+        private readonly ICategoryService _categoriesService;
 
-        public CategoriesController(ICategoriesService categoriesService)
+        public CategoriesController(ICategoryService categoriesService)
         {
             _categoriesService = categoriesService;
         }
 
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Index(CategorySpecParams specParams)
         {
             specParams.Status = null;
@@ -33,6 +35,7 @@ namespace Group1MVC.Controllers
             return View(categories);
         }
 
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create()
         {
             var specParams = new CategorySpecParams();
@@ -45,16 +48,27 @@ namespace Group1MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create([Bind("CategoryName,CategoryDescription,CategoryId")] CategoryToAddOrUpdateDTO category)
         {
             var result = false;
 
+            // Set status to true by default
             category.Status = true;
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                result = await _categoriesService.CreateCategoryAsync(category);
+                // Reload the categories in case of validation errors
+                var specParams = new CategorySpecParams { Status = true };
+                var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+                ViewBag.Categories = parentCategories;
+
+                // Return view with validation errors
+                return View(category);
             }
+
+            // Proceed with category creation if valid
+            result = await _categoriesService.CreateCategoryAsync(category);
 
             if (result)
             {
@@ -62,11 +76,12 @@ namespace Group1MVC.Controllers
                 return RedirectToAction("Index");
             }
 
+            TempData["ErrorMessage"] = "Error creating Category!";
             return View(category);
         }
 
-
         [HttpGet]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id)
         {
             var specParams = new CategorySpecParams();
@@ -86,7 +101,7 @@ namespace Group1MVC.Controllers
 
             var categoryToUpdate = new CategoryToAddOrUpdateDTO
             {
-                CategoryId = id,
+                CategoryId = category.ParentCategoryId.Value,
                 CategoryName = category.CategoryName,
                 CategoryDescription = category.CategoryDescription,
                 Status = category.IsActive
@@ -96,28 +111,40 @@ namespace Group1MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id, [Bind("CategoryName,CategoryDescription,CategoryId,Status")] CategoryToAddOrUpdateDTO category)
         {
             var result = false;
-            if (ModelState.IsValid)
+
+            // Validate the model
+            if (!ModelState.IsValid)
             {
-                result = await _categoriesService.EditCategoryAsync(id, category);
+                // Reload the categories list if validation fails
+                var specParams = new CategorySpecParams { Status = true };
+                var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+                ViewBag.Categories = parentCategories;
+                ViewData["Action"] = "Edit";
+
+                // Return the view with validation errors
+                return View(category);
             }
+
+            // Proceed with updating the category if the model is valid
+            result = await _categoriesService.EditCategoryAsync(id, category);
 
             if (result)
             {
-                TempData["SuccessMessage"] = "Cập nhật danh mục thành công!";
+                TempData["SuccessMessage"] = "Update successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                TempData["ErrorMessage"] = "Cập nhật danh mục thất bại!";
-            }
 
-            return View();
+            TempData["ErrorMessage"] = "Update failed!";
+            return View(category); // Return the view with the current category data
         }
 
+
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _categoriesService.DeleteCategoryAsync(id);
@@ -129,10 +156,9 @@ namespace Group1MVC.Controllers
             }
             else
             {
-                TempData["ErrorMessage"] = result;
+                TempData["ErrorMessage"] = "Delete failed due to the category is being applied to one or more news articles!";
+                return RedirectToAction(nameof(Index));
             }
-
-            return View();
         }
     }
 }

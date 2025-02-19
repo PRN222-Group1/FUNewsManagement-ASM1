@@ -1,4 +1,25 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+@using RepositoryLayer.Enums
+
+@{
+    int? currentUserId = null;
+    string currentUserRole = null;
+   
+    if (User?.Identity?.IsAuthenticated == true)
+    {
+        var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userRoleClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+
+        if (!string.IsNullOrEmpty(userIdClaim))
+        {
+            currentUserId = Int32.Parse(userIdClaim);
+        }
+
+        currentUserRole = userRoleClaim;
+    }
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -21,25 +42,67 @@
             </div>
             <ul class="list-unstyled components p-4">
                 <li class="mb-3 sidenav">
-                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
+                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
                         <i class="fa fa-home me-2"></i> Home
                     </a>
                 </li>
-                <li class="mb-3 sidenav">
-                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
-                        <i class="fa fa-newspaper me-2"></i> News Articles
-                    </a>
-                </li>
-                <li class="mb-3 sidenav">
-                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Categories" asp-action="Index">
-                        <i class="fa fa-list me-2"></i> Categories
-                    </a>
-                </li>
-                <li class="mb-3 sidenav">
-                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Account" asp-action="Login">
-                        <i class="fa fa-sign-in me-2"></i> Login
-                    </a>
-                </li>
+
+                @if (currentUserRole == Role.Staff.ToString()) {
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Categories" asp-action="Index">
+                            <i class="fa fa-list me-2"></i> Categories
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="IndexHistory" asp-route-id="@currentUserId">
+                            <i class="fa fa-history me-2"></i> History
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Tags" asp-action="Index">
+                            <i class="fa fa-hashtag me-2"></i> Tags
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Account" asp-action="Details" asp-route-id="@currentUserId">
+                            <i class="fa fa-user me-2"></i> Profile
+                        </a>
+                    </li>
+                }
+
+                @if (currentUserRole == Role.Admin.ToString()) {
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Account" asp-action="Index">
+                            <i class="fa fa-user me-2"></i> Accounts
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Report" asp-action="Index" asp-route-id="@currentUserId">
+                            <i class="fa fa-bar-chart me-2"></i> Report Statistic
+                        </a>
+                    </li>
+                }
+                
+                @if (User.Identity == null || !User.Identity.IsAuthenticated) {
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Account" asp-action="Login">
+                            <i class="fa fa-sign-in me-2"></i> Login
+                        </a>
+                    </li>
+                }
+                else {
+                    <li class="mb-3 sidenav">
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="text-dark d-block py-2 px-3 rounded text-decoration-none btn btn-link text-md nav-button">
+                                <i class="fa fa-sign-out me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                }
             </ul>
         </nav>
 

@@ -7,5 +7,6 @@ namespace RepositoryLayer.Specifications.Account
         [EmailAddress]
         public required string AccountEmail { get; set; }
         public required string AccountPassword { get; set; }
+        public string? ReturnUrl { get; set; }
     }
 }

@@ -117,6 +117,10 @@ body {
   margin-bottom: 60px;
 }
 
+.nav-button {
+    font-weight: 600;
+}
+
 #sidebar {
     height: 100%;
 }

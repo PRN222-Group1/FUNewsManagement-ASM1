@@ -1,8 +1,10 @@
-﻿using BusinessServiceLayer.Interfaces;
+﻿using BusinessServiceLayer.DTOs;
+using BusinessServiceLayer.Interfaces;
+using Group1MVC.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RepositoryLayer.Entities;
 using RepositoryLayer.Enums;
 using RepositoryLayer.Specifications.Account;
 using System.Security.Claims;
@@ -25,34 +27,65 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account
-        public async Task<IActionResult> Index()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Index(AccountSpecParams specParams)
         {
-            // TODO: View list of accounts
-            throw new NotImplementedException();
+            var accounts = await _accountService.GetAccountsAsync(specParams);
+
+            var count = await _accountService.CountAccountsAsync(specParams);
+
+            var paginatedResult = new Pagination<SystemAccountDTO>(specParams.PageNumber, specParams.PageSize, count, accounts);
+
+            // Set current filter and sort values for use in the view
+            ViewData["CurrentFilter"] = specParams.Search;
+            ViewData["CurrentSort"] = specParams.Sort;
+            ViewData["CurrentPageNumber"] = specParams.PageNumber;
+            ViewData["CurrentPageSize"] = specParams.PageSize;
+            ViewData["CurrentPageCount"] = Convert.ToInt32(Math.Ceiling((decimal)count / specParams.PageSize));
+
+            // Selected role
+            ViewData["SelectedRole"] = specParams.Role;
+
+            return View(paginatedResult);
         }
 
         // GET: Account/Details/5
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Details(int? id)
         {
-            // TODO: View account details
-            throw new NotImplementedException();
+            var account = await _accountService.GetAccountByIdAsync(id.Value);
+
+            ViewData["Role"] = GetUserRole();
+
+            if (account == null) return NotFound();
+
+            return View(account);
         }
 
         // GET: Account/Login
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "NewsArticles");
+            }
+
             var loginPayload = new LoginPayload() { 
                 AccountEmail = "",
                 AccountPassword = ""
             };
+
+            ViewData["ReturnUrl"] = returnUrl;
+
             return View(loginPayload);
         }
 
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([Bind("AccountEmail,AccountPassword")] LoginPayload loginPayload)
+        public async Task<IActionResult> Login([Bind("AccountEmail,AccountPassword,ReturnUrl")] LoginPayload loginPayload)
         {
+            var returnUrl = loginPayload.ReturnUrl ?? "~/NewsArticles/Index";
             if (ModelState.IsValid)
             {
                 ClaimsIdentity identity = null;
@@ -63,7 +96,7 @@ namespace Group1MVC.Controllers
                 {
                     // Create the identity for the Admin
                     identity = CreateIdentity(_adminEmail, 
-                        Role.Admin.ToString());
+                        Role.Admin.ToString(), -1);
 
                     isAuthenticated = true;
                 }
@@ -75,7 +108,7 @@ namespace Group1MVC.Controllers
                     {
                         // Create the identity for the user
                         identity = CreateIdentity(user.AccountEmail, 
-                            Enum.GetName(typeof(Role), user.AccountRole));
+                            user.AccountRole, user.Id);
 
                         isAuthenticated = true;
                     }
@@ -86,68 +119,171 @@ namespace Group1MVC.Controllers
                 {
                     var principal = new ClaimsPrincipal(identity);
                     var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    return RedirectToAction("Index", "Home");
+                    return LocalRedirect(returnUrl);
                 }
             }
 
+            TempData["ErrorMessage"] = "Incorrect email or password or the user account is deleted!";
             return View();
         }
 
+        // POST: Account/Logout
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
+        }
+
         // GET: Account/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
+            ViewData["Action"] = "Create";
+
             return View();
         }
 
         // POST: Account/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("AccountName,AccountEmail,AccountRole,AccountPassword,Id")] SystemAccount systemAccount)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create([Bind("AccountName,AccountEmail,AccountRole,AccountPassword,AccountConfirmPassword")] SystemAccountToAddOrUpdateDTO systemAccount)
         {
-            // TODO: Create new account
-            throw new NotImplementedException();
+            var result = false;
+
+            if (!ModelState.IsValid)
+            {
+                // Return the view with the invalid model and validation errors
+                ViewData["Action"] = "Create";
+                return View(systemAccount);
+            }
+
+            result = await _accountService.CreateAccountAsync(systemAccount);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Create Account Successfully!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["ErrorMessage"] = "Error creating account!";
+            return View(systemAccount);
         }
 
         // GET: Account/Edit/5
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Edit(int? id)
         {
-            return View(id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var account = await _accountService.GetAccountByIdAsync(id.Value);
+
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Action"] = "Edit";
+
+            // Convert account role from string to enum value
+            var role = (int)Enum.Parse(typeof(Role), account.AccountRole);
+            ViewBag.SelectedRole = role;
+
+            var accountToUpdate = new SystemAccountToAddOrUpdateDTO
+            {
+                AccountName = account.AccountName,
+                AccountEmail = account.AccountEmail,
+                AccountRole = role
+            };
+
+            return View(accountToUpdate);
         }
 
         // POST: Account/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("AccountName,AccountEmail,AccountRole,AccountPassword,Id")] SystemAccount systemAccount)
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> Edit(int id, [Bind("AccountName,AccountEmail,AccountRole,AccountPassword,AccountConfirmPassword")] SystemAccountToAddOrUpdateDTO systemAccount)
         {
-            // TODO: Update account
-            throw new NotImplementedException();
+            if (systemAccount.AccountPassword != systemAccount.AccountConfirmPassword)
+            {
+                TempData["ErrorMessage"] = "Confirm password is not the same as password!";
+
+                // Re-populate ViewData and return the view with the model
+                ViewData["Action"] = "Edit";
+                ViewBag.SelectedRole = systemAccount.AccountRole;
+                return View(systemAccount);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // If validation fails, return view with validation errors
+                ViewData["Action"] = "Edit";
+                ViewBag.SelectedRole = systemAccount.AccountRole;
+                return View(systemAccount);
+            }
+
+            var result = await _accountService.UpdateAccountAsync(id, systemAccount);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Update Account Successfully!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["ErrorMessage"] = "Error updating account!";
+            return View(systemAccount);
         }
 
-        // GET: Account/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            return View(id);
-        }
 
         // POST: Account/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete(int? id)
         {
-            // TODO: Delete account
-            throw new NotImplementedException();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _accountService.DeleteAccountAsync(id.Value);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Delete account successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Delete account failed!";
+            }
+
+            return RedirectToAction("Index");
         }
 
-        private ClaimsIdentity CreateIdentity(string email, string role)
+        private ClaimsIdentity CreateIdentity(string email, string role, int? id)
         {
             // Create the identity for the Admin
             var identity = new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Email, email),
-                new Claim(ClaimTypes.Role, role)
+                new Claim(ClaimTypes.Role, role),
+                new Claim(ClaimTypes.NameIdentifier, id.Value.ToString())
             }, CookieAuthenticationDefaults.AuthenticationScheme);
 
             return identity;
+        }
+
+        // Get the current user role
+        private string GetUserRole()
+        {
+            return User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
         }
     }
 }

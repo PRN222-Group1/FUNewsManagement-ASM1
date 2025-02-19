@@ -1,18 +1,19 @@
 ﻿using AutoMapper;
 using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
+using Microsoft.IdentityModel.Tokens;
 using RepositoryLayer.Entities;
 using RepositoryLayer.Interfaces;
 using RepositoryLayer.Specifications.Categories;
 
 namespace BusinessServiceLayer.Services;
 
-public class CategoriesService : ICategoriesService
+public class CategoryService : ICategoryService
 {
     private readonly IGenericRepository<Category> _repository;
     private readonly IMapper _mapper;
 
-    public CategoriesService(IGenericRepository<Category> repository, IMapper mapper)
+    public CategoryService(IGenericRepository<Category> repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;
@@ -29,9 +30,10 @@ public class CategoriesService : ICategoriesService
     public async Task<bool> DeleteCategoryAsync(int id)
     {
         bool result = false;
-        var category = await _repository.GetByIdAsync(id);
+        var spec = new CategorySpecification(id);
+        var category = await _repository.GetEntityWithSpec(spec);
 
-        if (category == null)
+        if (category == null || !category.NewsArticles.IsNullOrEmpty())
         {
             return result;
         }

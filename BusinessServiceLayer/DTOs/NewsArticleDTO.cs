@@ -1,4 +1,6 @@
-﻿namespace BusinessServiceLayer.DTOs
+﻿using RepositoryLayer.Entities;
+
+namespace BusinessServiceLayer.DTOs
 {
     public class NewsArticleDTO
     {
@@ -11,7 +13,11 @@
         public int? CategoryId { get; set; }
         public string? CategoryName { get; set; }
         public string? AuthorName { get; set; }
+        public int? CreatedById { get; set; }
+        public int? UpdatedById { get; set; }
+        public DateTime? ModifiedDate { get; set; }
         public bool NewsStatus { get; set; }
         public virtual ICollection<TagDTO>? Tags { get; set; }
+
     }
 }
