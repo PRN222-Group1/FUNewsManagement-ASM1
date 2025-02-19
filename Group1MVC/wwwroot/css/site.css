@@ -31,6 +31,11 @@ a:active {
     color: cornflowerblue;
 }
 
+.active {
+    background-color: #007bff;
+    color: white !important;
+}
+
 .logo {
     color: antiquewhite !important;
 }
