@@ -2,7 +2,6 @@
 using BusinessServiceLayer.Interfaces;
 using Group1MVC.Helpers;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using RepositoryLayer.Data;
 using RepositoryLayer.Enums;
 using RepositoryLayer.Specifications.NewsArticles;
@@ -89,7 +88,19 @@ namespace Group1MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
-            var result = false;
+            if (!ModelState.IsValid)
+            {
+                // Reload categories and tags in case of validation error
+                var categories = await _newsArticleService.GetAllCategories();
+                var tags = await _newsArticleService.GetAllTags();
+
+                ViewBag.Categories = categories;
+                ViewBag.Tags = tags;
+                ViewData["Action"] = "Create";
+
+                TempData["ErrorMessage"] = "Please enter the correct information!";
+                return View(newsArticle); // Return view to display validation errors
+            }
 
             // Set created and modified date to current time
             newsArticle.CreatedDate = DateTime.UtcNow;
@@ -104,15 +115,18 @@ namespace Group1MVC.Controllers
             newsArticle.UpdatedById = currentUser.Id;
             newsArticle.NewsStatus = true;
 
-            if (ModelState.IsValid)
+            var result = await _newsArticleService.CreateNewsArticleAsync(newsArticle);
+
+            if (result)
             {
-                result = await _newsArticleService.CreateNewsArticleAsync(newsArticle);
+                TempData["SuccessMessage"] = "Create News Article Successfully!";
+                return RedirectToAction("Index");
             }
 
-            if (result) return RedirectToAction("Index", "NewsArticles");
-
-            return View(newsArticle);
+            TempData["ErrorMessage"] = "Error creating News Article!";
+            return View(newsArticle); // Return the view in case of failure
         }
+
 
         // GET: NewsArticles/Edit/5
         public async Task<IActionResult> Edit(int id)
@@ -154,13 +168,39 @@ namespace Group1MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,UpdatedById,ModifiedDate,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
-            if (ModelState.IsValid)
+            // Check if the model state is valid
+            if (!ModelState.IsValid)
             {
-                await _newsArticleService.UpdateNewsArticleAsync(id, newsArticle);
-                return RedirectToAction(nameof(Index));
+                // Reload categories and tags in case of validation error
+                var categories = await _newsArticleService.GetAllCategories();
+                var tags = await _newsArticleService.GetAllTags();
+
+                // Prepare comma-separated Tag IDs for ViewBag
+                var selectedTagIds = newsArticle.TagIds;
+
+                ViewBag.Categories = categories;
+                ViewBag.Tags = tags;
+                ViewBag.SelectedCategoryId = newsArticle.CategoryId;
+                ViewBag.SelectedTagIds = selectedTagIds;
+                ViewData["Action"] = "Edit";
+
+                // Return the view to display validation errors
+                return View(newsArticle);
             }
-            return View();
+
+            // Update article if validation passes
+            var result = await _newsArticleService.UpdateNewsArticleAsync(id, newsArticle);
+
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Update News Article Successfully!";
+                return RedirectToAction("Index");
+            }
+
+            TempData["ErrorMessage"] = "Error updating News Article!";
+            return RedirectToAction("Edit", new { id });
         }
+
 
         // POST: NewsArticles/Delete/5
         [HttpPost]
@@ -176,10 +216,14 @@ namespace Group1MVC.Controllers
 
             if (result)
             {
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Delete News Article successfully!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Delete News Article failed!";
             }
 
-            return View();
+            return RedirectToAction("Index");
         }
 
         // Get the current user role

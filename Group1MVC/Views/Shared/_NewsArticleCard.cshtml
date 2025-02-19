@@ -22,18 +22,18 @@
             </div>
         </div>
 
-        @if (role.Equals(Role.Staff.ToString())) {
+        @if (!string.IsNullOrEmpty(role) && role.Equals(Role.Staff.ToString())) {
             <!-- Footer with buttons -->
             <div class="card-footer bg-light text-center p-3 d-flex justify-content-center">
                 <a class="btn btn-outline-primary btn-md d-flex align-items-center mx-2" asp-action="Edit" asp-route-id="@Model.Id">
-                    <i class="fa fa-edit"></i>
+                    <i class="fa fa-edit me-2"></i> Edit
                 </a>
 
                 <!-- Form submission button, triggered only on confirmation -->
                 <form asp-action="Delete" method="post" onsubmit="return confirm('Are you sure you want to delete this news article?')">
                     <input type="hidden" name="id" value="@Model.Id" />
                     <button type="submit" class="btn btn-danger">
-                        <i class="fa fa-trash-can"></i>
+                        <i class="fa fa-trash-can me-2"></i> Delete
                     </button>
                 </form>
             </div>

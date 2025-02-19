@@ -9,6 +9,6 @@ namespace BusinessServiceLayer.DTOs
 
         public string? AccountEmail { get; set; }
 
-        public int? AccountRole { get; set; }
+        public string? AccountRole { get; set; }
     }
 }

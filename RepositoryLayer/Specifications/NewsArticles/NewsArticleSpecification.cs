@@ -23,10 +23,10 @@ namespace RepositoryLayer.Specifications.NewsArticles
             {
                 switch (specParams.Sort)
                 {
-                    case "dateDesc":
+                    case "dateAsc":
                         AddOrderBy(na => na.CreatedDate);
                         break;
-                    case "dateAsc":
+                    case "dateDesc":
                         AddOrderByDescending(na => na.CreatedDate);
                         break;
                     case "titleDesc":

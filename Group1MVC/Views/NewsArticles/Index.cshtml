@@ -38,6 +38,16 @@
         </div>
     </div>
 
+    <!-- Show notification -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
     <div class="row mb-3">
         <div class="col-md-12">
             <form asp-action="Index" method="get" class="d-flex align-items-center justify-content-between">
@@ -63,9 +73,10 @@
             <partial name="_NewsArticleCard" model="article" />
         }
     </div>
-    @if (role.Equals(Role.Staff.ToString())) {
+    @if (!string.IsNullOrEmpty(role) && role.Equals(Role.Staff.ToString()))
+    {
         <p class="text-center">
-            <a asp-action="Create" class="btn btn-success">Create New Article</a>
+            <a asp-action="Create" class="btn btn-success">+ Create New Article</a>
         </p>
     }
 </div>

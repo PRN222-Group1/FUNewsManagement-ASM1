@@ -49,12 +49,22 @@ namespace Group1MVC.Controllers
         {
             var result = false;
 
+            // Set status to true by default
             category.Status = true;
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                result = await _categoriesService.CreateCategoryAsync(category);
+                // Reload the categories in case of validation errors
+                var specParams = new CategorySpecParams { Status = true };
+                var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+                ViewBag.Categories = parentCategories;
+
+                // Return view with validation errors
+                return View(category);
             }
+
+            // Proceed with category creation if valid
+            result = await _categoriesService.CreateCategoryAsync(category);
 
             if (result)
             {
@@ -62,8 +72,10 @@ namespace Group1MVC.Controllers
                 return RedirectToAction("Index");
             }
 
+            TempData["ErrorMessage"] = "Error creating Category!";
             return View(category);
         }
+
 
 
         [HttpGet]
@@ -99,24 +111,33 @@ namespace Group1MVC.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("CategoryName,CategoryDescription,CategoryId,Status")] CategoryToAddOrUpdateDTO category)
         {
             var result = false;
-            if (ModelState.IsValid)
+
+            // Validate the model
+            if (!ModelState.IsValid)
             {
-                result = await _categoriesService.EditCategoryAsync(id, category);
+                // Reload the categories list if validation fails
+                var specParams = new CategorySpecParams { Status = true };
+                var parentCategories = await _categoriesService.GetCategoriesAsync(specParams);
+                ViewBag.Categories = parentCategories;
+                ViewData["Action"] = "Edit";
+
+                // Return the view with validation errors
+                return View(category);
             }
+
+            // Proceed with updating the category if the model is valid
+            result = await _categoriesService.EditCategoryAsync(id, category);
 
             if (result)
             {
                 TempData["SuccessMessage"] = "Update successfully!";
                 return RedirectToAction(nameof(Index));
             }
-            else
-            {
-                TempData["ErrorMessage"] = "Update failed!";
-                return RedirectToAction(nameof(Index));
-            }
 
-            return View();
+            TempData["ErrorMessage"] = "Update failed!";
+            return View(category); // Return the view with the current category data
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
