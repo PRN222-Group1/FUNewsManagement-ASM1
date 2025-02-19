@@ -2,16 +2,17 @@
 
 public class NewsArticlesDTO
 {
+    public int Id { get; set; }
     public string NewsTitle { get; set; }
     public string Headline { get; set; }
-    public DateTime CreatedDate { get; set; }
+    public DateTime? CreatedDate { get; set; }
     public string NewsContent { get; set; }
     public string NewsSource { get; set; }
-    public int CategoryId { get; set; }
-    public bool NewsStatus { get; set; }
-    public int CreatedById { get; set; }
-    public int UpdatedById { get; set; }
-    public DateTime ModifiedDate { get; set; }
+    public int? CategoryId { get; set; }
+    public bool? NewsStatus { get; set; }
+    public int? CreatedById { get; set; }
+    public int? UpdatedById { get; set; }
+    public DateTime? ModifiedDate { get; set; }
 
     // Thông tin danh mục
     public string CategoryName { get; set; }

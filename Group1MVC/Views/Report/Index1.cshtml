@@ -1,0 +1,58 @@
+﻿@model Group1MVC.ViewModels.NewsArticleSearchByCreatedIdViewModel
+
+@{
+    ViewData["Title"] = "Tìm kiếm bài báo theo CreatedById";
+}
+
+<h2>Tìm kiếm bài báo theo CreatedById</h2>
+
+<form asp-action="Index1" method="post">
+    <div class="form-group">
+        <label asp-for="CreatedById" class="control-label"></label>
+        <input asp-for="CreatedById" type="number" class="form-control" />
+        <span asp-validation-for="CreatedById" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+</form>
+
+<hr />
+
+@if (Model.Results != null && Model.Results.Any())
+{
+    <h3>Kết quả tìm kiếm:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Tiêu đề</th>
+                <th>Headline</th>
+                <th>Ngày tạo</th>
+                <th>Chi tiết</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Results)
+            {
+                <tr>
+                    <td>@article.Id</td>
+                    <td>@article.NewsTitle</td>
+                    <td>@article.Headline</td>
+                    <td>@article.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        @Html.ActionLink("Chi tiết", "Detail", new { id = article.Id }, new { @class = "btn btn-info" })
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.Results != null)
+{
+    <p>Không có bài báo nào được tìm thấy.</p>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -46,5 +46,14 @@ namespace BusinessServiceLayer.Services
             var categories = await _unitOfWork.Repository<Category>().ListAllAsync();
             return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryDTO>>(categories);
         }
+
+        public async Task<NewsArticleDTO> GetNewsArticleByStaffId(int staffId)
+        {
+            var spec = new NewsArticleSpecification(staffId);
+            var newsArticle = await _unitOfWork.Repository<NewsArticle>().GetEntityWithSpec(spec);
+            return _mapper.Map<NewsArticle, NewsArticleDTO>(newsArticle);
+        }
+
+
     }
 }

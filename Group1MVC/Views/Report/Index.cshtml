@@ -1,0 +1,65 @@
+﻿@model Group1MVC.ViewModels.NewsArticleSearchViewModel
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<h2>Tìm kiếm bài báo theo khoảng thời gian</h2>
+
+<form asp-action="Index" method="post">
+    <div class="form-group">
+        <label asp-for="StartDate"></label>
+        <input asp-for="StartDate" class="form-control" />
+        <span asp-validation-for="StartDate" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="EndDate"></label>
+        <input asp-for="EndDate" class="form-control" />
+        <span asp-validation-for="EndDate" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+</form>
+
+
+
+@if (Model.Results != null && Model.Results.Any())
+{
+    <h3>Kết quả tìm kiếm:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tiêu đề</th>
+                <th>Thể loại</th>
+                <th>Ngày tạo</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var article in Model.Results)
+            {
+                <tr>
+                    <td>@article.NewsTitle</td>
+                    <td>@article.CategoryName</td>
+                    <td>@article.CreatedDate?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                         <a asp-action="Detail" asp-route-id="@article.Id">Detail</a>
+                        <a asp-action="Edit" asp-route-id="@article.Id">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@article.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (Model.Results != null)
+{
+    <p>Không có bài báo nào trong khoảng thời gian đã chọn.</p>
+}
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
