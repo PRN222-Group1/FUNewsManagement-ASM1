@@ -120,6 +120,11 @@ namespace RepositoryLayer.Data
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await _context.Set<T>().CountAsync();
+        }
+
         /// <summary>
         /// Return a true or false on whether the entity exists
         /// </summary>
@@ -129,5 +134,7 @@ namespace RepositoryLayer.Data
         {
             return _context.Set<T>().Any(x => x.Id == id);
         }
+       
+
     }
 }

@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BusinessServiceLayer.Interfaces;
+using BusinessServiceLayer.Services;
+using Group1MVC.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.Data;
 using RepositoryLayer.Interfaces;
 
@@ -16,6 +20,26 @@ namespace Group1MVC.Extensions
             });
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Register AutoMapper
+            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+            // Register Services
+            services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<INewsArticleService, NewsArticleService>();
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IReportService, ReportService>();
+
+            // Configure Cookie
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+
+            // Add Authentication
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
 
             return services;
         }

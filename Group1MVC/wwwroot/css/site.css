@@ -12,6 +12,102 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+label {
+    min-width: 80px;
+}
+
+a {
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    color: darkgray;
+}
+
+a:hover {
+    color: cornflowerblue !important;
+}
+
+a:active {
+    color: cornflowerblue;
+}
+
+.logo {
+    color: antiquewhite !important;
+}
+
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-custom {
+    background-color: #0d6efd;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.article-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.article-header {
+    border-bottom: 2px solid #eee;
+    padding-bottom: 1rem;
+}
+
+.article-title {
+    font-size: 2.5rem;
+    color: #333;
+}
+
+.article-meta {
+    font-size: 0.9rem;
+}
+
+.article-headline {
+    color: #555;
+}
+
+.article-body {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #444;
+    background: #f9f9f9;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.article-footer {
+    border-top: 2px solid #eee;
+    padding-top: 1rem;
+}
+
+.article-tags .badge {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    margin: 0.25rem;
+}
+
+.sidenav:hover {
+    background-color: rgba(0,0,0,0.1);
+    text-decoration: none;
+}
+
+.btn-lg {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+}
+
 html {
   position: relative;
   min-height: 100%;
@@ -19,4 +115,16 @@ html {
 
 body {
   margin-bottom: 60px;
+}
+
+.nav-button {
+    font-weight: 600;
+}
+
+#sidebar {
+    height: 100%;
+}
+
+#content {
+    height: 100%;
 }

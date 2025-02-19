@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace RepositoryLayer.Entities;
+﻿namespace RepositoryLayer.Entities;
 
 public partial class SystemAccount : BaseEntity
 {
