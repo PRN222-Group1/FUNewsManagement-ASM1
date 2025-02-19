@@ -1,4 +1,5 @@
-﻿using BusinessServiceLayer.Interfaces;
+﻿using AutoMapper;
+using BusinessServiceLayer.Interfaces;
 using BusinessServiceLayer.Services;
 using Group1MVC.Helpers;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,7 +23,10 @@ namespace Group1MVC.Extensions
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Register AutoMapper
-            services.AddAutoMapper(typeof(MappingProfile).Assembly);
+            services.AddSingleton<IMapper>(sp => new MapperConfiguration(cfg =>
+            {
+                cfg.AddProfile(new MappingProfile());
+            }).CreateMapper());
 
             // Register Services
             services.AddScoped<IAccountService, AccountService>();
