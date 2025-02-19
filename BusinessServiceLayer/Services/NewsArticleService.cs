@@ -49,6 +49,13 @@ namespace BusinessServiceLayer.Services
             return _mapper.Map<IReadOnlyList<Category>, IReadOnlyList<CategoryDTO>>(categories);
         }
 
+        public async Task<NewsArticleDTO> GetNewsArticleByStaffId(int staffId)
+        {
+            var spec = new NewsArticleSpecification(staffId);
+            var newsArticle = await _unitOfWork.Repository<NewsArticle>().GetEntityWithSpec(spec);
+            return _mapper.Map<NewsArticle, NewsArticleDTO>(newsArticle);
+        }
+
         public async Task<bool> CreateNewsArticleAsync(NewsArticleToAddOrUpdateDTO newsArticle)
         {
             // Split the TagIds string by commas and convert to a list of integers
@@ -129,6 +136,13 @@ namespace BusinessServiceLayer.Services
             var tags = await _unitOfWork.Repository<Tag>().ListAllAsync();
 
             return _mapper.Map<IReadOnlyList<Tag>, IReadOnlyList<TagDTO>>(tags);
+        }
+
+        public async Task<IReadOnlyList<NewsArticleDTO>> GetNewsArticleHistoryAsync(int accountId)
+        {
+            var spec = new NewsArticleHistorySpecification(accountId);
+            var newsArticles = await _unitOfWork.Repository<NewsArticle>().ListAsync(spec);
+            return _mapper.Map<IReadOnlyList<NewsArticle>, IReadOnlyList<NewsArticleDTO>>(newsArticles);
         }
     }
 }

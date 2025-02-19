@@ -226,6 +226,19 @@ namespace Group1MVC.Controllers
             return RedirectToAction("Index");
         }
 
+        // GET: NewsArticles History
+        public async Task<IActionResult> IndexHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var newsArticles = await _newsArticleService.GetNewsArticleHistoryAsync(id.Value);
+
+            return View(newsArticles);
+        }
+
         // Get the current user role
         private string GetUserRole()
         {

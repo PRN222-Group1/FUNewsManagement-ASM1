@@ -41,13 +41,14 @@
                 </a>
             </div>
             <ul class="list-unstyled components p-4">
-                <li class="mb-3 sidenav">
-                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
-                        <i class="fa fa-home me-2"></i> Home
-                    </a>
-                </li>
                 @if (currentUserRole != Role.Admin.ToString())
                 {
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="fa fa-home me-2"></i> Home
+                        </a>
+                    </li>
+
                     <li class="mb-3 sidenav">
                         <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
                             <i class="fa fa-newspaper me-2"></i> News Articles
@@ -58,6 +59,12 @@
                     <li class="mb-3 sidenav">
                         <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Categories" asp-action="Index">
                             <i class="fa fa-list me-2"></i> Categories
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="IndexHistory" asp-route-id="@currentUserId">
+                            <i class="fa fa-history me-2"></i> History
                         </a>
                     </li>
 
@@ -74,6 +81,12 @@
                             <i class="fa fa-user me-2"></i> Accounts
                         </a>
                     </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Report" asp-action="Index" asp-route-id="@currentUserId">
+                            <i class="fa fa-bar-chart me-2"></i> Report Statistic
+                        </a>
+                    </li>
                 }
                 
                 @if (User.Identity == null || !User.Identity.IsAuthenticated) {
@@ -86,7 +99,7 @@
                 else {
                     <li class="mb-3 sidenav">
                         <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-                            <button type="submit" class="text-dark d-block py-2 px-3 rounded text-decoration-none btn btn-link text-md">
+                            <button type="submit" class="text-dark d-block py-2 px-3 rounded text-decoration-none btn btn-link text-md nav-button">
                                 <i class="fa fa-sign-out me-2"></i> Logout
                             </button>
                         </form>

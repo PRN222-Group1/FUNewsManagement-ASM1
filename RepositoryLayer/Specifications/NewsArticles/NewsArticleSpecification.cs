@@ -49,5 +49,15 @@ namespace RepositoryLayer.Specifications.NewsArticles
             AddInclude(na => na.CreatedBy);
             AddInclude(na => na.Category);
         }
+
+        public NewsArticleSpecification(DateTime? startDate, DateTime? endDate) : base(x =>
+            !(startDate.HasValue && endDate.HasValue) 
+            || (x.CreatedDate >= startDate && x.CreatedDate <= endDate)
+        )
+        {
+            AddOrderByDescending(na => na.CreatedDate);
+            AddInclude(na => na.CreatedBy);
+            AddInclude(na => na.Category);
+        }
     }
 }

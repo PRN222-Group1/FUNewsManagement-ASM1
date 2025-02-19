@@ -21,6 +21,8 @@ namespace Group1MVC.ViewModels
         public string SelectedSortOption { get; set; }
         public int? SelectedRoleOption { get; set; }
         public int? SelectedCategory { get; set; } = null;
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
         public List<SortOption> SortOptions { get; set; }
         public IReadOnlyList<CategoryDTO> Categories { get; set; }
         public List<RoleOption> RolesList { get; set; }

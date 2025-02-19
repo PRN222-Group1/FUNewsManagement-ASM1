@@ -15,5 +15,12 @@ namespace RepositoryLayer.Specifications.NewsArticles
             )
         {
         }
+
+        public NewsArticleCountSpecification(DateTime? startDate, DateTime? endDate) : base(x =>
+            !(startDate.HasValue && endDate.HasValue)
+            || (x.CreatedDate >= startDate && x.CreatedDate <= endDate)
+        )
+        {
+        }
     }
 }

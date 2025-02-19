@@ -13,5 +13,6 @@ namespace BusinessServiceLayer.Interfaces
         Task<bool> UpdateNewsArticleAsync(int id, NewsArticleToAddOrUpdateDTO newsArticle);
         Task<bool> DeleteNewsArticleAsync(int id);
         Task<IReadOnlyList<TagDTO>> GetAllTags();
+        Task<IReadOnlyList<NewsArticleDTO>> GetNewsArticleHistoryAsync(int accountId);
     }
 }
