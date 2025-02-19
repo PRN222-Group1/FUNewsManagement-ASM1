@@ -1,6 +1,7 @@
 ﻿using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
 using Group1MVC.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Data;
 using RepositoryLayer.Enums;
@@ -71,6 +72,7 @@ namespace Group1MVC.Controllers
         }
 
         // GET: NewsArticles/Create
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create()
         {
             var categories = await _newsArticleService.GetAllCategories();
@@ -86,6 +88,7 @@ namespace Group1MVC.Controllers
         // POST: NewsArticles/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create([Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
             if (!ModelState.IsValid)
@@ -129,6 +132,7 @@ namespace Group1MVC.Controllers
 
 
         // GET: NewsArticles/Edit/5
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id)
         {
             var categories = await _newsArticleService.GetAllCategories();
@@ -166,6 +170,7 @@ namespace Group1MVC.Controllers
         // POST: NewsArticles/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id, [Bind("NewsTitle,Headline,NewsContent,NewsSource,CategoryId,NewsStatus,UpdatedById,ModifiedDate,TagIds")] NewsArticleToAddOrUpdateDTO newsArticle)
         {
             // Check if the model state is valid
@@ -205,6 +210,7 @@ namespace Group1MVC.Controllers
         // POST: NewsArticles/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -227,6 +233,7 @@ namespace Group1MVC.Controllers
         }
 
         // GET: NewsArticles History
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> IndexHistory(int? id)
         {
             if (id == null)

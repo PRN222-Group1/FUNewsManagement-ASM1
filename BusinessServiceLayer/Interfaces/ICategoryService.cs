@@ -3,7 +3,7 @@ using RepositoryLayer.Specifications.Categories;
 
 namespace BusinessServiceLayer.Interfaces;
 
-public interface ICategoriesService
+public interface ICategoryService
 {
     Task<IReadOnlyList<CategoryDTO>> GetCategoriesAsync(CategorySpecParams specParams);
     Task<CategoryDTO> GetCategoryByIdAsync(int id);

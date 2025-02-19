@@ -3,6 +3,7 @@ using BusinessServiceLayer.Interfaces;
 using Group1MVC.Helpers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Enums;
 using RepositoryLayer.Specifications.Account;
@@ -26,6 +27,7 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(AccountSpecParams specParams)
         {
             var accounts = await _accountService.GetAccountsAsync(specParams);
@@ -48,9 +50,12 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account/Details/5
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Details(int? id)
         {
             var account = await _accountService.GetAccountByIdAsync(id.Value);
+
+            ViewData["Role"] = GetUserRole();
 
             if (account == null) return NotFound();
 
@@ -58,20 +63,29 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account/Login
-        public IActionResult Login()
+        public IActionResult Login(string? returnUrl)
         {
+            if (User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "NewsArticles");
+            }
+
             var loginPayload = new LoginPayload() { 
                 AccountEmail = "",
                 AccountPassword = ""
             };
+
+            ViewData["ReturnUrl"] = returnUrl;
+
             return View(loginPayload);
         }
 
         // POST: Account/Login
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login([Bind("AccountEmail,AccountPassword")] LoginPayload loginPayload)
+        public async Task<IActionResult> Login([Bind("AccountEmail,AccountPassword,ReturnUrl")] LoginPayload loginPayload)
         {
+            var returnUrl = loginPayload.ReturnUrl ?? "~/NewsArticles/Index";
             if (ModelState.IsValid)
             {
                 ClaimsIdentity identity = null;
@@ -105,7 +119,7 @@ namespace Group1MVC.Controllers
                 {
                     var principal = new ClaimsPrincipal(identity);
                     var login = HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
-                    return RedirectToAction("Index", "Home");
+                    return LocalRedirect(returnUrl);
                 }
             }
 
@@ -116,6 +130,7 @@ namespace Group1MVC.Controllers
         // POST: Account/Logout
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -123,6 +138,7 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account/Create
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["Action"] = "Create";
@@ -133,6 +149,7 @@ namespace Group1MVC.Controllers
         // POST: Account/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("AccountName,AccountEmail,AccountRole,AccountPassword,AccountConfirmPassword")] SystemAccountToAddOrUpdateDTO systemAccount)
         {
             var result = false;
@@ -157,6 +174,7 @@ namespace Group1MVC.Controllers
         }
 
         // GET: Account/Edit/5
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -190,6 +208,7 @@ namespace Group1MVC.Controllers
         // POST: Account/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> Edit(int id, [Bind("AccountName,AccountEmail,AccountRole,AccountPassword,AccountConfirmPassword")] SystemAccountToAddOrUpdateDTO systemAccount)
         {
             if (systemAccount.AccountPassword != systemAccount.AccountConfirmPassword)
@@ -226,6 +245,7 @@ namespace Group1MVC.Controllers
         // POST: Account/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -258,6 +278,12 @@ namespace Group1MVC.Controllers
             }, CookieAuthenticationDefaults.AuthenticationScheme);
 
             return identity;
+        }
+
+        // Get the current user role
+        private string GetUserRole()
+        {
+            return User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
         }
     }
 }

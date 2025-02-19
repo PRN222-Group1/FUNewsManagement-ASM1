@@ -8,12 +8,12 @@ using RepositoryLayer.Specifications.Categories;
 
 namespace BusinessServiceLayer.Services;
 
-public class CategoriesService : ICategoriesService
+public class CategoryService : ICategoryService
 {
     private readonly IGenericRepository<Category> _repository;
     private readonly IMapper _mapper;
 
-    public CategoriesService(IGenericRepository<Category> repository, IMapper mapper)
+    public CategoryService(IGenericRepository<Category> repository, IMapper mapper)
     {
         _repository = repository;
         _mapper = mapper;

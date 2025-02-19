@@ -1,5 +1,6 @@
 ﻿using BusinessServiceLayer.DTOs;
 using BusinessServiceLayer.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Specifications.Categories;
 
@@ -7,13 +8,14 @@ namespace Group1MVC.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly ICategoriesService _categoriesService;
+        private readonly ICategoryService _categoriesService;
 
-        public CategoriesController(ICategoriesService categoriesService)
+        public CategoriesController(ICategoryService categoriesService)
         {
             _categoriesService = categoriesService;
         }
 
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Index(CategorySpecParams specParams)
         {
             specParams.Status = null;
@@ -33,6 +35,7 @@ namespace Group1MVC.Controllers
             return View(categories);
         }
 
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create()
         {
             var specParams = new CategorySpecParams();
@@ -45,6 +48,7 @@ namespace Group1MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Create([Bind("CategoryName,CategoryDescription,CategoryId")] CategoryToAddOrUpdateDTO category)
         {
             var result = false;
@@ -76,9 +80,8 @@ namespace Group1MVC.Controllers
             return View(category);
         }
 
-
-
         [HttpGet]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id)
         {
             var specParams = new CategorySpecParams();
@@ -98,7 +101,7 @@ namespace Group1MVC.Controllers
 
             var categoryToUpdate = new CategoryToAddOrUpdateDTO
             {
-                CategoryId = id,
+                CategoryId = category.ParentCategoryId.Value,
                 CategoryName = category.CategoryName,
                 CategoryDescription = category.CategoryDescription,
                 Status = category.IsActive
@@ -108,6 +111,7 @@ namespace Group1MVC.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Edit(int id, [Bind("CategoryName,CategoryDescription,CategoryId,Status")] CategoryToAddOrUpdateDTO category)
         {
             var result = false;
@@ -140,6 +144,7 @@ namespace Group1MVC.Controllers
 
 
         [HttpPost]
+        [Authorize(Roles = "Staff")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _categoriesService.DeleteCategoryAsync(id);

@@ -35,6 +35,8 @@
                 <span asp-validation-for="AccountPassword" class="text-danger"></span>
             </div>
 
+            <input type="hidden" asp-for="ReturnUrl" value="@ViewData["ReturnUrl"]" />
+
             <div class="form-group mt-3">
                 <input type="submit" value="Login" class="btn btn-custom w-100" />
             </div>

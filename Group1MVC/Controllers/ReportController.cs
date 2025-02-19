@@ -1,5 +1,6 @@
 ﻿using BusinessServiceLayer.Interfaces;
 using Group1MVC.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RepositoryLayer.Data;
 
@@ -16,6 +17,8 @@ namespace Group1MVC.Controllers
             _reportService = reportService;
             _context = context;
         }
+
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
         {
             var newsArticles = await _reportService.GetNewsArticlesByDateRangeAsync(startDate, endDate);

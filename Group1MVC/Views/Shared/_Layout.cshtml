@@ -41,20 +41,12 @@
                 </a>
             </div>
             <ul class="list-unstyled components p-4">
-                @if (currentUserRole != Role.Admin.ToString())
-                {
-                    <li class="mb-3 sidenav">
-                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Home" asp-action="Index">
-                            <i class="fa fa-home me-2"></i> Home
-                        </a>
-                    </li>
+                <li class="mb-3 sidenav">
+                    <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
+                        <i class="fa fa-home me-2"></i> Home
+                    </a>
+                </li>
 
-                    <li class="mb-3 sidenav">
-                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="Index">
-                            <i class="fa fa-newspaper me-2"></i> News Articles
-                        </a>
-                    </li>
-                }
                 @if (currentUserRole == Role.Staff.ToString()) {
                     <li class="mb-3 sidenav">
                         <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Categories" asp-action="Index">
@@ -65,6 +57,12 @@
                     <li class="mb-3 sidenav">
                         <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="NewsArticles" asp-action="IndexHistory" asp-route-id="@currentUserId">
                             <i class="fa fa-history me-2"></i> History
+                        </a>
+                    </li>
+
+                    <li class="mb-3 sidenav">
+                        <a class="text-dark d-block py-2 px-3 rounded text-decoration-none" asp-area="" asp-controller="Tags" asp-action="Index">
+                            <i class="fa fa-hashtag me-2"></i> Tags
                         </a>
                     </li>
 
